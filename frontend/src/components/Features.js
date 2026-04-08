@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
+import BackgroundVideo from "../components/BackgroundVideo";
 
 const container = {
   hidden: {},
   show: {
-    transition: {
-      staggerChildren: 0.15,
-    },
+    transition: { staggerChildren: 0.15 },
   },
 };
 
@@ -14,75 +13,76 @@ const item = {
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.6, ease: "easeOut" },
   },
 };
+
+const features = [
+  { icon: "⚡", title: "Fast", desc: "Get answers instantly from your documents." },
+  { icon: "🔒", title: "Secure", desc: "Your files are private and protected." },
+  { icon: "🎯", title: "Accurate", desc: "AI answers based on your data." },
+  { icon: "🧠", title: "Smart AI", desc: "Understands context, not just keywords." },
+  { icon: "📂", title: "Multi-doc", desc: "Upload and search across multiple files." },
+  { icon: "☁️", title: "Cloud ready", desc: "Access your documents anytime, anywhere." },
+];
 
 function Features() {
   return (
     <section
       id="features"
-      className="py-28 px-6 text-center relative overflow-hidden"
+      className="relative py-24 px-6 text-center overflow-hidden"
     >
 
-      {/* 🌈 MOVING BACKGROUND */}
-      <div className="absolute inset-0 animate-gradient bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-green-500/10 blur-3xl opacity-30 pointer-events-none" />
+      {/* 🎥 VIDEO BACKGROUND */}
+      <BackgroundVideo />
 
-      {/* TITLE */}
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-4xl font-bold mb-16 relative z-10"
-      >
-        Why Use This Tool?
-      </motion.h2>
+      {/* 🔥 OVERLAY (adjust if needed) */}
+      <div className="absolute inset-0 bg-black/30 z-[1]" />
 
-      {/* GRID */}
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto relative z-10"
-      >
+      {/* CONTENT */}
+      <div className="relative z-10">
 
-        {[
-          { icon: "⚡", title: "Fast", desc: "Get answers instantly from your documents.", glow: "purple" },
-          { icon: "🔒", title: "Secure", desc: "Your files are private and protected.", glow: "blue" },
-          { icon: "🎯", title: "Accurate", desc: "AI answers based on your data.", glow: "green" },
-          { icon: "🧠", title: "Smart AI", desc: "Understands context, not just keywords.", glow: "pink" },
-          { icon: "📂", title: "Multi Docs", desc: "Upload and search across multiple files.", glow: "yellow" },
-          { icon: "☁️", title: "Cloud Ready", desc: "Access your documents anytime, anywhere.", glow: "cyan" },
-        ].map((f, i) => (
-          <motion.div
-            key={i}
-            variants={item}
-            whileHover={{ y: -10, scale: 1.05 }}
-            className="relative bg-white/5 backdrop-blur-lg p-6 rounded-xl border border-white/10 shadow-lg transition"
-          >
+        {/* TITLE */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-3xl font-medium mb-12 text-white"
+        >
+          Why use this tool?
+        </motion.h2>
 
-            {/* 🔥 GLOW */}
-            <div className={`absolute inset-0 rounded-xl opacity-0 hover:opacity-100 transition blur-xl bg-${f.glow}-500/20`} />
+        {/* GRID */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto"
+        >
+          {features.map((f, i) => (
+            <motion.div
+              key={i}
+              variants={item}
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-6 text-left"
+            >
+              <span className="text-xl block mb-3">{f.icon}</span>
 
-            <div className="relative z-10">
-              <h3 className="text-2xl mb-2">{f.icon}</h3>
-              <h3 className="font-semibold mb-2 text-lg">
+              <h3 className="font-medium text-base mb-1 text-white">
                 {f.title}
               </h3>
-              <p className="text-gray-400 text-sm">
+
+              <p className="text-gray-300 text-sm leading-relaxed">
                 {f.desc}
               </p>
-            </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
-          </motion.div>
-        ))}
-
-      </motion.div>
-
-      {/* 🔥 BOTTOM GLOW */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-blue-500/20 blur-3xl opacity-30 pointer-events-none" />
-
+      </div>
     </section>
   );
 }

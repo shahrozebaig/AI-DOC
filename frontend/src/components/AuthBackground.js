@@ -15,7 +15,7 @@ function AuthBackground() {
         />
       </video>
       {/* GRADIENT OVERLAY */}
-      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-white/0 backdrop-blur-sm" />
 
     </div>
   );
