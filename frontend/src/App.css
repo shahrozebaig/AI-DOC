@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes gradientMove {
+  0% { transform: translateX(-20%); }
+  50% { transform: translateX(20%); }
+  100% { transform: translateX(-20%); }
+}
+
+.animate-gradient {
+  animation: gradientMove 8s ease-in-out infinite;
+}

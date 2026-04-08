@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { signOut } from "../services/auth"; // ✅ ADD THIS
+import { signOut } from "../services/auth";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); 
+  const [showPassword, setShowPassword] = useState(false); 
 
   const handleReset = async () => {
-    if (!password) return alert("Enter new password");
+    if (!password || !confirmPassword) {
+      return alert("Enter both fields");
+    }
+
+    if (password !== confirmPassword) {
+      return alert("Passwords do not match");
+    }
 
     const { error } = await supabase.auth.updateUser({
       password,
@@ -17,10 +25,7 @@ function ResetPassword() {
     } else {
       alert("Password updated successfully!");
 
-      // 🔥 LOGOUT FIRST
       await signOut();
-
-      // 🔥 THEN REDIRECT TO LOGIN
       window.location.href = "/login";
     }
   };
@@ -33,12 +38,39 @@ function ResetPassword() {
           Reset Password
         </h2>
 
-        <input
-          type="password"
-          placeholder="New Password"
-          className="w-full p-2 mb-3 text-black rounded"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        {/* PASSWORD */}
+        <div className="relative mb-2">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="New Password"
+            className="w-full p-2 text-black rounded"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-2.5 cursor-pointer text-gray-600"
+          >
+            👁
+          </span>
+        </div>
+
+        {/* CONFIRM PASSWORD */}
+        <div className="relative mb-3">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            className="w-full p-2 text-black rounded"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-2.5 cursor-pointer text-gray-600"
+          >
+            👁
+          </span>
+        </div>
 
         <button
           onClick={handleReset}
@@ -51,5 +83,4 @@ function ResetPassword() {
     </div>
   );
 }
-
 export default ResetPassword;

@@ -11,46 +11,69 @@ function Navbar() {
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
 
-  // ✅ UPDATED LOGOUT (FULL RESET FIX)
+  const isLandingPage = location.pathname === "/";
+
   const handleLogout = async () => {
     await signOut();
-
-    // 🔥 force clean redirect
     window.location.href = "/";
   };
 
-  // 🔥 Get initials (fallback avatar)
   const getInitials = () => {
     if (!user?.email) return "U";
     const name = user.email.split("@")[0];
     return name.slice(0, 2).toUpperCase();
   };
 
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4">
 
       {/* LEFT */}
-      <Link to="/" className="text-lg font-semibold">
+      <Link to="/" className="text-lg font-semibold text-white">
         DocuMind
       </Link>
+
+      {/* CENTER (LANDING ONLY) */}
+      {isLandingPage && !user && (
+        <div className="hidden md:flex gap-6 text-gray-300">
+          <button
+            onClick={() => scrollToSection("features")}
+            className="hover:text-white"
+          >
+            Features
+          </button>
+
+          <button
+            onClick={() => scrollToSection("how")}
+            className="hover:text-white"
+          >
+            How It Works
+          </button>
+        </div>
+      )}
 
       {/* RIGHT */}
       <div className="flex items-center gap-4">
 
-        {/* BACK BUTTON */}
+        {/* 🔥 FIXED BACK BUTTON */}
         {isAuthPage && (
           <button
             onClick={() => navigate("/")}
-            className="text-gray-300 hover:text-white"
+            className="bg-black/70 text-white px-4 py-2 rounded hover:bg-black transition"
           >
             ← Back
           </button>
         )}
 
-        {/* LOGGED IN */}
+        {/* DASHBOARD */}
         {user && !isAuthPage && (
           <>
-            {/* SETTINGS */}
             <button
               onClick={() => navigate("/settings")}
               className="text-gray-300 hover:text-white"
@@ -58,12 +81,10 @@ function Navbar() {
               Settings
             </button>
 
-            {/* AVATAR */}
             <div className="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-semibold">
               {getInitials()}
             </div>
 
-            {/* LOGOUT */}
             <button
               onClick={handleLogout}
               className="bg-red-500 px-4 py-2 rounded text-white"
@@ -82,7 +103,7 @@ function Navbar() {
 
             <Link
               to="/signup"
-              className="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700"
+              className="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700 text-white"
             >
               Sign Up
             </Link>
