@@ -16,10 +16,17 @@ function Navbar() {
     navigate("/");
   };
 
+  // 🔥 Get initials (fallback avatar)
+  const getInitials = () => {
+    if (!user?.email) return "U";
+    const name = user.email.split("@")[0];
+    return name.slice(0, 2).toUpperCase();
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4">
 
-      {/* LEFT - LOGO */}
+      {/* LEFT */}
       <Link to="/" className="text-lg font-semibold">
         DocuMind
       </Link>
@@ -27,7 +34,7 @@ function Navbar() {
       {/* RIGHT */}
       <div className="flex items-center gap-4">
 
-        {/* LOGIN / SIGNUP PAGE → BACK BUTTON */}
+        {/* BACK BUTTON */}
         {isAuthPage && (
           <button
             onClick={() => navigate("/")}
@@ -37,23 +44,36 @@ function Navbar() {
           </button>
         )}
 
-        {/* DASHBOARD (LOGGED IN) → ONLY LOGOUT */}
+        {/* LOGGED IN */}
         {user && !isAuthPage && (
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 px-4 py-2 rounded text-white"
-          >
-            Logout
-          </button>
-        )}
-
-        {/* LANDING PAGE (NOT LOGGED IN) */}
-        {!user && !isAuthPage && (
           <>
-            <Link
-              to="/login"
+            {/* SETTINGS */}
+            <button
+              onClick={() => navigate("/settings")}
               className="text-gray-300 hover:text-white"
             >
+              Settings
+            </button>
+
+            {/* AVATAR */}
+            <div className="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-semibold">
+              {getInitials()}
+            </div>
+
+            {/* LOGOUT */}
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 px-4 py-2 rounded text-white"
+            >
+              Logout
+            </button>
+          </>
+        )}
+
+        {/* NOT LOGGED IN */}
+        {!user && !isAuthPage && (
+          <>
+            <Link to="/login" className="text-gray-300 hover:text-white">
               Login
             </Link>
 

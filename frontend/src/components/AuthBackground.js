@@ -1,7 +1,6 @@
 function AuthBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
-
       {/* VIDEO */}
       <video
         autoPlay
@@ -15,12 +14,10 @@ function AuthBackground() {
           type="video/mp4"
         />
       </video>
-
       {/* GRADIENT OVERLAY */}
       <div className="absolute inset-0 bg-white/30 backdrop-blur-sm" />
 
     </div>
   );
 }
-
 export default AuthBackground;

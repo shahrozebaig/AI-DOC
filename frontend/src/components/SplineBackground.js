@@ -1,8 +1,5 @@
 import { Suspense, lazy } from "react";
-
-// lazy load (performance)
 const Spline = lazy(() => import("@splinetool/react-spline"));
-
 function SplineBackground() {
   return (
     <div className="absolute inset-0">
@@ -17,5 +14,4 @@ function SplineBackground() {
     </div>
   );
 }
-
 export default SplineBackground;

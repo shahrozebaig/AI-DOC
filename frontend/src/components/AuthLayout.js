@@ -1,5 +1,4 @@
 import Navbar from "./Navbar";
-
 function AuthLayout({ children }) {
   return (
     <div className="min-h-screen text-black relative z-10">
@@ -13,5 +12,4 @@ function AuthLayout({ children }) {
     </div>
   );
 }
-
 export default AuthLayout;

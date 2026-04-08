@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-
 function MessageBubble({ message, isUser }) {
   return (
     <motion.div
@@ -19,5 +18,4 @@ function MessageBubble({ message, isUser }) {
     </motion.div>
   );
 }
-
 export default MessageBubble;
