@@ -1,0 +1,48 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Build / dist
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Vector DB / embeddings (IMPORTANT)
+app/vector_store/
+backend/app/vector_store/
+
+# Uploaded files
+app/data/uploads/
+backend/app/data/uploads/
+
+# HuggingFace cache (optional)
+.cache/
+huggingface/
+
+# Temporary files
+*.tmp
+*.bak
