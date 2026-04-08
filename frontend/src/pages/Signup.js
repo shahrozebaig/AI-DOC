@@ -5,6 +5,7 @@ import {
   signUp,
   signInWithGoogle,
   signInWithGithub,
+  signOut, // ✅ ADD THIS
 } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -15,13 +16,20 @@ function Signup() {
   const navigate = useNavigate();
 
   const handleSignup = async () => {
+    if (!email || !password) {
+      return alert("Enter email and password");
+    }
+
     const { error } = await signUp(email, password);
 
     if (error) {
       alert(error.message);
     } else {
-      alert("Check your email for verification!");
-      navigate("/login");
+      // ✅ LOGOUT USER AFTER SIGNUP
+      await signOut();
+
+      alert("Account created! Please login.");
+      navigate("/login"); // stay on login page
     }
   };
 
@@ -56,10 +64,8 @@ function Signup() {
             Sign Up
           </button>
 
-          {/* DIVIDER */}
           <div className="text-center text-gray-500 mb-3">or</div>
 
-          {/* GOOGLE */}
           <button
             onClick={signInWithGoogle}
             className="w-full border p-2 rounded mb-2 hover:bg-gray-100"
@@ -67,13 +73,23 @@ function Signup() {
             Continue with Google
           </button>
 
-          {/* GITHUB */}
           <button
             onClick={signInWithGithub}
             className="w-full border p-2 rounded hover:bg-gray-100"
           >
             Continue with GitHub
           </button>
+
+          {/* SWITCH TO LOGIN */}
+          <div className="text-center text-sm text-gray-600 mt-4">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/login")}
+              className="text-blue-600 cursor-pointer hover:underline"
+            >
+              Login
+            </span>
+          </div>
 
         </div>
       </AuthLayout>

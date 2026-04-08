@@ -21,7 +21,7 @@ function Hero() {
         {/* Buttons */}
         <div className="flex justify-center gap-4 mt-6 pointer-events-auto animate-fade-up">
           <Link
-            to="/signup"
+            to="/login"
             className="bg-primary text-black px-6 py-3 rounded hover:brightness-110"
           >
             Get Started Free

@@ -21,7 +21,7 @@ export const signOut = async () => {
   return await supabase.auth.signOut();
 };
 
-// 🔥 GOOGLE LOGIN (UPDATED)
+// 🔥 GOOGLE LOGIN
 export const signInWithGoogle = async () => {
   return await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -31,12 +31,26 @@ export const signInWithGoogle = async () => {
   });
 };
 
-// 🔥 GITHUB LOGIN (UPDATED)
+// 🔥 GITHUB LOGIN
 export const signInWithGithub = async () => {
   return await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
       redirectTo: "http://localhost:3000/dashboard",
     },
+  });
+};
+
+// 🔥 FORGOT PASSWORD
+export const resetPassword = async (email) => {
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "http://localhost:3000/reset-password",
+  });
+};
+
+// 🔥 UPDATE PASSWORD (AFTER EMAIL LINK)
+export const updatePassword = async (newPassword) => {
+  return await supabase.auth.updateUser({
+    password: newPassword,
   });
 };

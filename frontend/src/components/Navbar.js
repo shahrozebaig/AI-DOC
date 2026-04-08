@@ -11,9 +11,12 @@ function Navbar() {
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
 
+  // ✅ UPDATED LOGOUT (FULL RESET FIX)
   const handleLogout = async () => {
     await signOut();
-    navigate("/");
+
+    // 🔥 force clean redirect
+    window.location.href = "/";
   };
 
   // 🔥 Get initials (fallback avatar)

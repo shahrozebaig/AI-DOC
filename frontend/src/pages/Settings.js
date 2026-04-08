@@ -9,44 +9,44 @@ function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState(
-    user?.user_metadata?.username || ""
-  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const updateUsername = async () => {
-    const { error } = await supabase.auth.updateUser({
-      data: { username },
-    });
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Username updated!");
-      window.location.reload();
-    }
-  };
-
+  // 🔥 UPDATE EMAIL + LOGOUT
   const updateEmail = async () => {
     if (!email) return alert("Enter email");
 
     const { error } = await supabase.auth.updateUser({ email });
 
-    if (error) alert(error.message);
-    else alert("Email updated! Check inbox.");
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("Email updated! Please login again.");
+
+      // ✅ logout + redirect
+      await signOut();
+      window.location.href = "/login";
+    }
   };
 
+  // 🔥 UPDATE PASSWORD + LOGOUT
   const updatePassword = async () => {
     if (!password) return alert("Enter password");
 
     const { error } = await supabase.auth.updateUser({ password });
 
-    if (error) alert(error.message);
-    else alert("Password updated!");
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("Password updated! Please login again.");
+
+      // ✅ logout + redirect
+      await signOut();
+      window.location.href = "/login";
+    }
   };
 
-  // 🔥 REAL DELETE ACCOUNT
+  // 🔥 DELETE ACCOUNT (UNCHANGED)
   const deleteAccount = async () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete your account?"
@@ -69,9 +69,8 @@ function Settings() {
 
       alert(data.message);
 
-      // logout + redirect
       await signOut();
-      navigate("/");
+      window.location.href = "/";
 
     } catch (err) {
       alert("Error deleting account");
@@ -93,21 +92,6 @@ function Settings() {
         </button>
 
         <h2 className="text-2xl mb-6 font-semibold">Settings</h2>
-
-        {/* USERNAME */}
-        <div className="mb-5">
-          <input
-            value={username}
-            className="w-full p-2 text-black rounded"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <button
-            onClick={updateUsername}
-            className="mt-2 bg-primary text-black px-4 py-2 rounded"
-          >
-            Update Username
-          </button>
-        </div>
 
         {/* EMAIL */}
         <div className="mb-5">
