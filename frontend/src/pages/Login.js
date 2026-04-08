@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import AuthLayout from "../components/AuthLayout";
 import AuthBackground from "../components/AuthBackground";
 import {
@@ -7,6 +7,7 @@ import {
   signInWithGithub,
 } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,14 @@ function Login() {
   const [remember, setRemember] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
+  // 🔥 redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleLogin = async () => {
     const { error } = await signIn(email, password);
