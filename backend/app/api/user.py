@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # 🔥 IMPORTANT
 
 router = APIRouter()
 
@@ -15,6 +18,10 @@ class DeleteUserRequest(BaseModel):
 
 @router.delete("/delete-account")
 def delete_account(req: DeleteUserRequest):
+
+    if not SUPABASE_URL or not SERVICE_ROLE_KEY:
+        raise HTTPException(status_code=500, detail="Missing Supabase config")
+
     url = f"{SUPABASE_URL}/auth/v1/admin/users/{req.user_id}"
 
     headers = {
@@ -25,6 +32,6 @@ def delete_account(req: DeleteUserRequest):
     response = requests.delete(url, headers=headers)
 
     if response.status_code != 200:
-        raise HTTPException(status_code=400, detail="Failed to delete user")
+        raise HTTPException(status_code=400, detail=response.text)
 
     return {"message": "Account deleted successfully"}
