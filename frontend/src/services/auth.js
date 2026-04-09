@@ -26,7 +26,7 @@ export const signInWithGoogle = async () => {
   return await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "https://ai-doc-2-xk83.onrender.com/dashboard",
+      redirectTo: "http://localhost:3000/dashboard",
     },
   });
 };
@@ -36,7 +36,7 @@ export const signInWithGithub = async () => {
   return await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: "https://ai-doc-2-xk83.onrender.com/dashboard",
+      redirectTo: "http://localhost:3000/dashboard",
     },
   });
 };
@@ -44,7 +44,7 @@ export const signInWithGithub = async () => {
 // 🔥 FORGOT PASSWORD
 export const resetPassword = async (email) => {
   return await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://ai-doc-2-xk83.onrender.com/reset-password",
+    redirectTo: "http://localhost:3000/reset-password",
   });
 };
 
