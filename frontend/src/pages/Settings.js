@@ -65,7 +65,7 @@ function Settings() {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch("http://localhost:8000/user/delete-account", {
+      const res = await fetch("https://ai-doc-1-d543.onrender.com/user/delete-account", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id }),
