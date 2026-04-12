@@ -14,20 +14,29 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errorField, setErrorField] = useState("");
 
   const navigate = useNavigate();
 
   const handleSignup = async () => {
-    if (!email || !password || !confirmPassword)
-      return alert("Enter all fields");
+    if (!email) return setErrorField("email");
+    if (!password) return setErrorField("password");
+    if (!confirmPassword) return setErrorField("confirmPassword");
 
-    if (password !== confirmPassword)
+    if (password !== confirmPassword) {
+      setErrorField("confirmPassword");
       return alert("Passwords do not match");
+    }
+    setErrorField("");
 
     const { error } = await signUp(email, password);
 
-    if (error) alert(error.message);
-    else {
+    if (error) {
+      if (error.message.toLowerCase().includes("email")) setErrorField("email");
+      else if (error.message.toLowerCase().includes("password")) setErrorField("password");
+      else setErrorField("both");
+      alert(error.message);
+    } else {
       await signOut();
       alert("Account created! Please login.");
       navigate("/login");
@@ -73,7 +82,7 @@ function Signup() {
             borderRadius: "20px",
             border: "0.5px solid rgba(0,0,0,0.1)",
             padding: "2rem",
-            width: "340px",
+            width: "400px",
             boxShadow: "0 2px 24px rgba(0,0,0,0.07)",
           }}
         >
@@ -202,7 +211,7 @@ function Signup() {
                 marginBottom: "5px",
               }}
             >
-              Email
+              Email <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
             </label>
             <input
               type="email"
@@ -212,13 +221,13 @@ function Signup() {
                 boxSizing: "border-box",
                 padding: "9px 12px",
                 fontSize: "14px",
-                border: "0.5px solid #d1d5db",
+                border: errorField === "email" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
                 borderRadius: "10px",
                 background: "#f9fafb",
                 color: "#1a1a1a",
                 outline: "none",
               }}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
             />
           </div>
 
@@ -233,7 +242,7 @@ function Signup() {
                 marginBottom: "5px",
               }}
             >
-              Password
+              Password <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
             </label>
             <div style={{ position: "relative" }}>
               <input
@@ -244,13 +253,13 @@ function Signup() {
                   boxSizing: "border-box",
                   padding: "9px 38px 9px 12px",
                   fontSize: "14px",
-                  border: "0.5px solid #d1d5db",
+                  border: errorField === "password" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
                   borderRadius: "10px",
                   background: "#f9fafb",
                   color: "#1a1a1a",
                   outline: "none",
                 }}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
@@ -279,7 +288,7 @@ function Signup() {
                 marginBottom: "5px",
               }}
             >
-              Confirm password
+              Confirm password <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
             </label>
             <div style={{ position: "relative" }}>
               <input
@@ -290,13 +299,13 @@ function Signup() {
                   boxSizing: "border-box",
                   padding: "9px 38px 9px 12px",
                   fontSize: "14px",
-                  border: "0.5px solid #d1d5db",
+                  border: errorField === "confirmPassword" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
                   borderRadius: "10px",
                   background: "#f9fafb",
                   color: "#1a1a1a",
                   outline: "none",
                 }}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => { setConfirmPassword(e.target.value); setErrorField(''); }}
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}

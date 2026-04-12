@@ -15,6 +15,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorField, setErrorField] = useState("");
 
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -26,8 +27,17 @@ function Login() {
   }, [user, navigate]);
 
   const handleLogin = async () => {
+    if (!email) return setErrorField("email");
+    if (!password) return setErrorField("password");
+    setErrorField("");
+
     const { error } = await signIn(email, password);
-    if (error) alert(error.message);
+    if (error) {
+      if (error.message.toLowerCase().includes("email") || error.message.toLowerCase().includes("user")) setErrorField("email");
+      else if (error.message.toLowerCase().includes("password")) setErrorField("password");
+      else setErrorField("both");
+      alert(error.message);
+    }
     else navigate("/dashboard");
   };
 
@@ -51,7 +61,7 @@ function Login() {
             borderRadius: "20px",
             border: "0.5px solid rgba(0,0,0,0.1)",
             padding: "2rem",
-            width: "340px",
+            width: "400px",
             boxShadow: "0 2px 24px rgba(0,0,0,0.07)",
           }}
         >
@@ -185,7 +195,7 @@ function Login() {
                 marginBottom: "5px",
               }}
             >
-              Email
+              Email <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
             </label>
             <input
               type="email"
@@ -195,13 +205,13 @@ function Login() {
                 boxSizing: "border-box",
                 padding: "9px 12px",
                 fontSize: "14px",
-                border: "0.5px solid #d1d5db",
+                border: errorField === "email" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
                 borderRadius: "10px",
                 background: "#f9fafb",
                 color: "#1a1a1a",
                 outline: "none",
               }}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
             />
           </div>
 
@@ -222,7 +232,7 @@ function Login() {
                   color: "#374151",
                 }}
               >
-                Password
+                Password <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
               </label>
               <span
                 onClick={handleForgotPassword}
@@ -245,13 +255,13 @@ function Login() {
                   boxSizing: "border-box",
                   padding: "9px 38px 9px 12px",
                   fontSize: "14px",
-                  border: "0.5px solid #d1d5db",
+                  border: errorField === "password" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
                   borderRadius: "10px",
                   background: "#f9fafb",
                   color: "#1a1a1a",
                   outline: "none",
                 }}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
