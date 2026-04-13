@@ -30,6 +30,12 @@ function Login() {
   useEffect(() => {
     const checkRedirect = async () => {
       if (user) {
+        // If the user disabled 2FA (paused it), bypass the prompt.
+        if (user.user_metadata?.is_mfa_enabled === false) {
+          navigate("/dashboard");
+          return;
+        }
+
         const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
         if (mfaData && mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
           // Fetch factors to get the ID

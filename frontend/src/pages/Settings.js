@@ -50,10 +50,15 @@ function Settings() {
       }
 
       if (verifiedFactor) {
-        setMfaEnabled(true);
         setMfaUnenrollFactorId(verifiedFactor.id);
+        if (user.user_metadata?.is_mfa_enabled === false) {
+          setMfaEnabled(false);
+        } else {
+          setMfaEnabled(true);
+        }
       } else {
         setMfaEnabled(false);
+        setMfaUnenrollFactorId("");
       }
     };
     checkMFA();
@@ -117,7 +122,20 @@ function Settings() {
   };
 
   // 🔥 MFA Handlers
-  const handleEnableMfaClick = () => {
+  const handleEnableMfaClick = async () => {
+    if (mfaUnenrollFactorId) {
+      // Re-enable existing factor
+      const { error } = await supabase.auth.updateUser({
+        data: { is_mfa_enabled: true }
+      });
+      if (error) {
+        alert("Error re-enabling 2FA: " + error.message);
+      } else {
+        alert("Two-Factor Authentication Re-Enabled! You can continue using your previous Authenticator app.");
+        setMfaEnabled(true);
+      }
+      return;
+    }
     setMfaSetupStep("askPassword");
   };
 
@@ -174,6 +192,11 @@ function Settings() {
 
       if (verifyError) throw verifyError;
 
+      // Update user metadata to clearly mark it enabled
+      await supabase.auth.updateUser({
+        data: { is_mfa_enabled: true }
+      });
+
       alert("2FA Enabled Successfully!");
       setMfaEnabled(true);
       setMfaUnenrollFactorId(mfaFactorId);
@@ -187,13 +210,17 @@ function Settings() {
   const disableMfa = async () => {
     if (!window.confirm("Are you sure you want to disable Two-Factor Authentication?")) return;
     
-    const { error } = await supabase.auth.mfa.unenroll({ factorId: mfaUnenrollFactorId });
+    // Instead of unenrolling totally, we just pause it.
+    // That way they don't have to scan the QR code again next time!
+    const { error } = await supabase.auth.updateUser({
+      data: { is_mfa_enabled: false }
+    });
+
     if (error) {
        alert("Error disabling 2FA: " + error.message);
     } else {
        alert("Two-Factor Authentication Disabled.");
        setMfaEnabled(false);
-       setMfaUnenrollFactorId("");
     }
   };
 
