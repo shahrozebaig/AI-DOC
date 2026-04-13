@@ -34,6 +34,7 @@ function Settings() {
   const [mfaVerifyCode, setMfaVerifyCode] = useState("");
   const [mfaVerifyError, setMfaVerifyError] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
+  const [mfaLoading, setMfaLoading] = useState(false);
 
   useEffect(() => {
     const checkMFA = async () => {
@@ -125,13 +126,14 @@ function Settings() {
   const handleEnableMfaClick = async () => {
     if (mfaUnenrollFactorId) {
       // Re-enable existing factor
+      setMfaLoading(true);
       const { error } = await supabase.auth.updateUser({
         data: { is_mfa_enabled: true }
       });
+      setMfaLoading(false);
       if (error) {
         alert("Error re-enabling 2FA: " + error.message);
       } else {
-        alert("Two-Factor Authentication Re-Enabled! You can continue using your previous Authenticator app.");
         setMfaEnabled(true);
       }
       return;
@@ -152,6 +154,7 @@ function Settings() {
   const startMfaSetup = async () => {
     if (!mfaPassword) return setMfaPasswordError("mfaPassword");
     setMfaPasswordError("");
+    setMfaLoading(true);
 
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
@@ -159,6 +162,7 @@ function Settings() {
     });
 
     if (loginError) {
+      setMfaLoading(false);
       setMfaPasswordError("mfaPassword");
       return alert("Current password is incorrect");
     }
@@ -167,6 +171,7 @@ function Settings() {
       factorType: 'totp',
     });
 
+    setMfaLoading(false);
     if (error) {
       return alert("Error setting up MFA: " + error.message);
     }
@@ -179,6 +184,7 @@ function Settings() {
   const confirmMfaSetup = async () => {
     if (!mfaVerifyCode) return setMfaVerifyError("Required");
     setMfaVerifyError("");
+    setMfaLoading(true);
 
     try {
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
@@ -197,30 +203,43 @@ function Settings() {
         data: { is_mfa_enabled: true }
       });
 
-      alert("2FA Enabled Successfully!");
       setMfaEnabled(true);
       setMfaUnenrollFactorId(mfaFactorId);
       cancelMfaSetup();
     } catch (err) {
       setMfaVerifyError("Invalid code");
       alert(err.message);
+    } finally {
+      setMfaLoading(false);
     }
   };
 
   const disableMfa = async () => {
-    if (!window.confirm("Are you sure you want to disable Two-Factor Authentication?")) return;
-    
-    // Instead of unenrolling totally, we just pause it.
-    // That way they don't have to scan the QR code again next time!
+    if (!mfaPassword) return setMfaPasswordError("mfaPassword");
+    setMfaPasswordError("");
+    setMfaLoading(true);
+
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: mfaPassword,
+    });
+
+    if (loginError) {
+      setMfaLoading(false);
+      setMfaPasswordError("mfaPassword");
+      return alert("Current password is incorrect");
+    }
+
     const { error } = await supabase.auth.updateUser({
       data: { is_mfa_enabled: false }
     });
 
+    setMfaLoading(false);
     if (error) {
        alert("Error disabling 2FA: " + error.message);
     } else {
-       alert("Two-Factor Authentication Disabled.");
        setMfaEnabled(false);
+       cancelMfaSetup();
     }
   };
 
@@ -397,16 +416,41 @@ function Settings() {
 
             <div className="bg-black/30 p-5 rounded-xl border border-white/5 mt-2">
               {mfaEnabled ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <p className="text-sm text-gray-300">Your account is currently protected by 2FA. You will be required to enter an OTP from your authenticator app each time you sign in.</p>
-                  <button onClick={disableMfa} className="flex-shrink-0 px-5 py-2.5 bg-red-500/10 text-red-500 font-semibold rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/20 text-sm">
-                    Disable 2FA
-                  </button>
-                </div>
+                mfaSetupStep === "askPasswordDisable" ? (
+                  <div className="space-y-4 max-w-sm">
+                    <p className="text-sm text-gray-300">Please verify your password to disable Two-Factor Authentication.</p>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Current password"
+                        className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all pr-12 ${mfaPasswordError === "mfaPassword" ? "border-red-500" : "border-white/10 focus:border-red-500 focus:bg-black/70"}`}
+                        onChange={(e) => { setMfaPassword(e.target.value); setMfaPasswordError(""); }}
+                        onKeyDown={(e) => e.key === 'Enter' && disableMfa()}
+                      />
+                      <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 bottom-3.5 text-gray-500 hover:text-gray-300 transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      </button>
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                      <button onClick={disableMfa} disabled={mfaLoading} className="flex-1 bg-red-600/90 text-white py-2.5 rounded-lg font-medium hover:bg-red-500 transition-all text-sm disabled:opacity-50">
+                        {mfaLoading ? "Processing..." : "Verify & Disable"}
+                      </button>
+                      <button onClick={cancelMfaSetup} disabled={mfaLoading} className="flex-1 bg-white/5 text-gray-300 py-2.5 rounded-lg hover:bg-white/10 transition-colors border border-white/10 text-sm disabled:opacity-50">Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <p className="text-sm text-gray-300 flex-1">Your account is currently protected by 2FA. You will be required to enter an OTP from your authenticator app each time you sign in.</p>
+                    <button onClick={() => setMfaSetupStep('askPasswordDisable')} className="flex-shrink-0 px-5 py-2.5 bg-red-500/10 text-red-500 font-semibold rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/20 text-sm flex items-center justify-center gap-2">
+                       Disable 2FA
+                    </button>
+                  </div>
+                )
               ) : mfaSetupStep === "idle" ? (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <p className="text-sm text-gray-300">Set up 2FA using a mobile app like <strong className="text-white">Google Authenticator</strong> or <strong className="text-white">Authy</strong>.</p>
-                  <button onClick={handleEnableMfaClick} className="flex-shrink-0 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg transition-colors shadow-[0_0_15px_rgba(147,51,234,0.3)] text-sm active:scale-95">
+                  <p className="text-sm text-gray-300 flex-1">Set up 2FA using a mobile app like <strong className="text-white">Google Authenticator</strong> or <strong className="text-white">Authy</strong>.</p>
+                  <button onClick={handleEnableMfaClick} disabled={mfaLoading} className="flex-shrink-0 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg transition-colors shadow-[0_0_15px_rgba(147,51,234,0.3)] text-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                    {mfaLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : null}
                     Enable 2FA
                   </button>
                 </div>
@@ -452,12 +496,17 @@ function Settings() {
                           value={mfaVerifyCode}
                           onKeyDown={(e) => e.key === 'Enter' && confirmMfaSetup()}
                         />
-                        <button onClick={confirmMfaSetup} className="px-5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-500 transition-all text-sm whitespace-nowrap">Verify</button>
+                          <button onClick={confirmMfaSetup} disabled={mfaLoading} className="px-5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-500 transition-all text-sm whitespace-nowrap disabled:opacity-50 shadow-[0_0_15px_rgba(147,51,234,0.2)]">
+                             {mfaLoading ? "Verifying..." : "Verify"}
+                          </button>
                       </div>
                       {mfaVerifyError && <p className="text-red-400 text-xs mt-1.5">{mfaVerifyError}</p>}
                     </div>
                     <div className="pt-2">
-                       <button onClick={cancelMfaSetup} className="text-xs text-gray-500 hover:text-white transition-colors underline">Cancel Setup</button>
+                       <button onClick={cancelMfaSetup} disabled={mfaLoading} className="text-xs text-gray-500 hover:text-white transition-colors flex items-center gap-1.5 underline">
+                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                         Cancel Setup
+                       </button>
                     </div>
                   </div>
                 </div>
