@@ -74,298 +74,137 @@ function Signup() {
       <AuthBackground />
 
       <AuthLayout>
-        <div
-          style={{
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderRadius: "20px",
-            border: "0.5px solid rgba(0,0,0,0.1)",
-            padding: "2rem",
-            width: "400px",
-            boxShadow: "0 2px 24px rgba(0,0,0,0.07)",
-          }}
-        >
-          {/* Header */}
-          <div style={{ marginBottom: "1.75rem" }}>
-            <div
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "10px",
-                background: "#1a1a1a",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "1rem",
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
+        <div className="flex w-full max-w-4xl bg-white/95 backdrop-blur-xl rounded-[24px] shadow-2xl overflow-hidden mx-4 min-h-[550px] border border-white/20">
+          
+          {/* LEFT: Branding */}
+          <div className="hidden md:flex w-2/5 flex-col justify-between p-10 bg-gradient-to-br from-black to-gray-900 relative">
+            <div className="relative z-10 flex flex-col space-y-6">
+              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white tracking-tight leading-tight">Start your <br/>journey.</h1>
+                <p className="text-gray-400 text-sm mt-3 leading-relaxed">
+                  Sign up today and experience the future of intelligent document analysis.
+                </p>
+              </div>
             </div>
-            <h2
-              style={{
-                fontSize: "20px",
-                fontWeight: 500,
-                margin: "0 0 4px",
-                color: "#1a1a1a",
-              }}
-            >
-              Create an account
-            </h2>
-            <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>
-              Sign up to get started today
-            </p>
-          </div>
 
-          {/* Social Buttons */}
-          <div style={{ display: "flex", gap: "8px", marginBottom: "1.25rem" }}>
-            <button
-              onClick={signInWithGoogle}
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "9px",
-                border: "0.5px solid #d1d5db",
-                borderRadius: "10px",
-                background: "white",
-                cursor: "pointer",
-                fontSize: "13px",
-                color: "#1a1a1a",
-                fontWeight: 500,
-              }}
-            >
-              <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-                alt="google"
-                style={{ width: "16px", height: "16px" }}
-              />
-              Google
-            </button>
-
-            <button
-              onClick={signInWithGithub}
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "9px",
-                border: "0.5px solid #d1d5db",
-                borderRadius: "10px",
-                background: "white",
-                cursor: "pointer",
-                fontSize: "13px",
-                color: "#1a1a1a",
-                fontWeight: 500,
-              }}
-            >
-              <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
-                alt="github"
-                style={{ width: "16px", height: "16px" }}
-              />
-              GitHub
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "1.25rem",
-            }}
-          >
-            <div style={{ flex: 1, height: "0.5px", background: "#e5e7eb" }} />
-            <span style={{ fontSize: "12px", color: "#9ca3af" }}>
-              or continue with email
-            </span>
-            <div style={{ flex: 1, height: "0.5px", background: "#e5e7eb" }} />
-          </div>
-
-          {/* Email */}
-          <div style={{ marginBottom: "12px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: "#374151",
-                marginBottom: "5px",
-              }}
-            >
-              Email <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
-            </label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                padding: "9px 12px",
-                fontSize: "14px",
-                border: errorField === "email" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
-                borderRadius: "10px",
-                background: "#f9fafb",
-                color: "#1a1a1a",
-                outline: "none",
-              }}
-              onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
-            />
-          </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: "12px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: "#374151",
-                marginBottom: "5px",
-              }}
-            >
-              Password <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
-            </label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "9px 38px 9px 12px",
-                  fontSize: "14px",
-                  border: errorField === "password" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
-                  borderRadius: "10px",
-                  background: "#f9fafb",
-                  color: "#1a1a1a",
-                  outline: "none",
-                }}
-                onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
-              />
-              <span
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "11px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
-                  lineHeight: 0,
-                }}
-              >
-                <EyeIcon crossed={showPassword} />
-              </span>
+            <div className="relative z-10 p-5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md mt-10">
+              <ul className="space-y-3 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</div>
+                  Semantic Document Search
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</div>
+                  AI Context Generation
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</div>
+                  Secure Cloud Workspace
+                </li>
+              </ul>
             </div>
           </div>
 
-          {/* Confirm Password */}
-          <div style={{ marginBottom: "18px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: "#374151",
-                marginBottom: "5px",
-              }}
-            >
-              Confirm password <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
-            </label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "9px 38px 9px 12px",
-                  fontSize: "14px",
-                  border: errorField === "confirmPassword" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
-                  borderRadius: "10px",
-                  background: "#f9fafb",
-                  color: "#1a1a1a",
-                  outline: "none",
-                }}
-                onChange={(e) => { setConfirmPassword(e.target.value); setErrorField(''); }}
-              />
-              <span
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "11px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
-                  lineHeight: 0,
-                }}
+          {/* RIGHT: Form */}
+          <div className="w-full md:w-3/5 p-8 sm:p-12 flex flex-col justify-center">
+            
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Create an account</h2>
+              <p className="text-sm text-gray-500">Sign up to get started today.</p>
+            </div>
+
+            {/* Social Buttons */}
+            <div className="flex gap-4 mb-5">
+              <button
+                onClick={signInWithGoogle}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700"
               >
-                <EyeIcon crossed={showPassword} />
-              </span>
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" />
+                Google
+              </button>
+
+              <button
+                onClick={signInWithGithub}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700"
+              >
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="github" className="w-4 h-4" />
+                GitHub
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 mb-5">
+              <div className="flex-1 h-[1px] bg-gray-200" />
+              <span className="text-xs text-gray-400 font-medium tracking-wide uppercase">or register with email</span>
+              <div className="flex-1 h-[1px] bg-gray-200" />
+            </div>
+
+            <div className="space-y-4">
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email <span className="text-red-500">*</span></label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  className={`w-full p-3 bg-gray-50 border rounded-xl outline-none transition-colors ${
+                    errorField === "email" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                  }`}
+                  onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Password <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${
+                      errorField === "password" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                    }`}
+                    onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
+                  />
+                  <button
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Confirm password <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${
+                      errorField === "confirmPassword" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                    }`}
+                    onChange={(e) => { setConfirmPassword(e.target.value); setErrorField(''); }}
+                  />
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                onClick={handleSignup}
+                className="w-full bg-black text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition-colors active:scale-[0.98] mt-2"
+              >
+                Create account
+              </button>
+
+              <p className="text-center text-sm text-gray-500 mt-4">
+                Already have an account?{" "}
+                <span onClick={() => navigate("/login")} className="text-primary font-semibold hover:underline cursor-pointer">Sign in</span>
+              </p>
             </div>
           </div>
-
-          {/* Sign Up Button */}
-          <button
-            onClick={handleSignup}
-            style={{
-              width: "100%",
-              padding: "10px",
-              background: "#1a1a1a",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "14px",
-              fontWeight: 500,
-              cursor: "pointer",
-              letterSpacing: "0.01em",
-              transition: "opacity 0.15s ease",
-            }}
-            onMouseEnter={(e) => (e.target.style.opacity = "0.85")}
-            onMouseLeave={(e) => (e.target.style.opacity = "1")}
-          >
-            Create account
-          </button>
-
-          {/* Login Link */}
-          <p
-            style={{
-              textAlign: "center",
-              fontSize: "13px",
-              color: "#6b7280",
-              margin: "1.25rem 0 0",
-            }}
-          >
-            Already have an account?{" "}
-            <span
-              onClick={() => navigate("/login")}
-              style={{
-                color: "#4f46e5",
-                cursor: "pointer",
-                fontWeight: 500,
-              }}
-            >
-              Sign in
-            </span>
-          </p>
         </div>
       </AuthLayout>
     </div>

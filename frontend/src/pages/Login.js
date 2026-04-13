@@ -53,349 +53,116 @@ function Login() {
       <AuthBackground />
 
       <AuthLayout>
-        <div
-          style={{
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderRadius: "20px",
-            border: "0.5px solid rgba(0,0,0,0.1)",
-            padding: "2rem",
-            width: "400px",
-            boxShadow: "0 2px 24px rgba(0,0,0,0.07)",
-          }}
-        >
-          {/* Header */}
-          <div style={{ marginBottom: "1.75rem" }}>
-            <div
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "10px",
-                background: "#1a1a1a",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "1rem",
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <polyline points="10 17 15 12 10 7" />
-                <line x1="15" y1="12" x2="3" y2="12" />
-              </svg>
+        <div className="flex w-full max-w-4xl bg-white/95 backdrop-blur-xl rounded-[24px] shadow-2xl overflow-hidden mx-4 min-h-[550px] border border-white/20">
+          
+          {/* LEFT: Branding */}
+          <div className="hidden md:flex w-2/5 flex-col justify-center p-10 bg-gradient-to-br from-black to-gray-900 relative">
+            <div className="relative z-10 flex flex-col space-y-6">
+              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white tracking-tight leading-tight">Welcome <br/>back.</h1>
+                <p className="text-gray-400 text-sm mt-3 leading-relaxed">
+                  Log in to continue exploring your documents with AI-powered semantic search and summarization.
+                </p>
+              </div>
             </div>
-            <h2
-              style={{
-                fontSize: "20px",
-                fontWeight: 500,
-                margin: "0 0 4px",
-                color: "#1a1a1a",
-              }}
-            >
-              Welcome back
-            </h2>
-            <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>
-              Sign in to your account to continue
-            </p>
           </div>
 
-          {/* Social Buttons */}
-          <div style={{ display: "flex", gap: "8px", marginBottom: "1.25rem" }}>
-            <button
-              onClick={signInWithGoogle}
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "9px",
-                border: "0.5px solid #d1d5db",
-                borderRadius: "10px",
-                background: "white",
-                cursor: "pointer",
-                fontSize: "13px",
-                color: "#1a1a1a",
-                fontWeight: 500,
-              }}
-            >
-              <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-                alt="google"
-                style={{ width: "16px", height: "16px" }}
-              />
-              Google
-            </button>
+          {/* RIGHT: Form */}
+          <div className="w-full md:w-3/5 p-8 sm:p-12 flex flex-col justify-center">
+            
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
+              <p className="text-sm text-gray-500">Welcome back! Please enter your details.</p>
+            </div>
 
-            <button
-              onClick={signInWithGithub}
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "9px",
-                border: "0.5px solid #d1d5db",
-                borderRadius: "10px",
-                background: "white",
-                cursor: "pointer",
-                fontSize: "13px",
-                color: "#1a1a1a",
-                fontWeight: 500,
-              }}
-            >
-              <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
-                alt="github"
-                style={{ width: "16px", height: "16px" }}
-              />
-              GitHub
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "1.25rem",
-            }}
-          >
-            <div
-              style={{ flex: 1, height: "0.5px", background: "#e5e7eb" }}
-            />
-            <span style={{ fontSize: "12px", color: "#9ca3af" }}>
-              or continue with email
-            </span>
-            <div
-              style={{ flex: 1, height: "0.5px", background: "#e5e7eb" }}
-            />
-          </div>
-
-          {/* Email */}
-          <div style={{ marginBottom: "12px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: "#374151",
-                marginBottom: "5px",
-              }}
-            >
-              Email <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
-            </label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                padding: "9px 12px",
-                fontSize: "14px",
-                border: errorField === "email" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
-                borderRadius: "10px",
-                background: "#f9fafb",
-                color: "#1a1a1a",
-                outline: "none",
-              }}
-              onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
-            />
-          </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: "6px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "5px",
-              }}
-            >
-              <label
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  color: "#374151",
-                }}
+            {/* Social Buttons */}
+            <div className="flex gap-4 mb-6">
+              <button
+                onClick={signInWithGoogle}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700"
               >
-                Password <span style={{ color: "rgb(239, 68, 68)" }}>*</span>
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" />
+                Google
+              </button>
+
+              <button
+                onClick={signInWithGithub}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700"
+              >
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="github" className="w-4 h-4" />
+                GitHub
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-[1px] bg-gray-200" />
+              <span className="text-xs text-gray-400 font-medium tracking-wide uppercase">or continue with email</span>
+              <div className="flex-1 h-[1px] bg-gray-200" />
+            </div>
+
+            <div className="space-y-5">
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email <span className="text-red-500">*</span></label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  className={`w-full p-3 bg-gray-50 border rounded-xl outline-none transition-colors ${
+                    errorField === "email" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                  }`}
+                  onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <div className="flex justify-between items-center mb-1.5 px-1">
+                  <label className="text-sm font-medium text-gray-700">Password <span className="text-red-500">*</span></label>
+                  <span onClick={handleForgotPassword} className="text-xs text-primary font-semibold hover:underline cursor-pointer">Forgot password?</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${
+                      errorField === "password" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                    }`}
+                    onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
+                  />
+                  <button
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me */}
+              <label className="flex items-center gap-2 cursor-pointer pt-1" onClick={() => setRemember(!remember)}>
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${remember ? "bg-black border-black" : "border-gray-300"}`}>
+                  {remember && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                </div>
+                <span className="text-sm text-gray-600 select-none">Remember me for 30 days</span>
               </label>
-              <span
-                onClick={handleForgotPassword}
-                style={{
-                  fontSize: "12px",
-                  color: "#4f46e5",
-                  cursor: "pointer",
-                  fontWeight: 500,
-                }}
+
+              {/* Login Button */}
+              <button
+                onClick={handleLogin}
+                className="w-full bg-black text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition-colors active:scale-[0.98] mt-2"
               >
-                Forgot password?
-              </span>
-            </div>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "9px 38px 9px 12px",
-                  fontSize: "14px",
-                  border: errorField === "password" || errorField === "both" ? "1px solid rgb(239, 68, 68)" : "0.5px solid #d1d5db",
-                  borderRadius: "10px",
-                  background: "#f9fafb",
-                  color: "#1a1a1a",
-                  outline: "none",
-                }}
-                onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
-              />
-              <span
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "11px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
-                  lineHeight: 0,
-                }}
-              >
-                {showPassword ? (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </span>
+                Sign In
+              </button>
+
+              <p className="text-center text-sm text-gray-500 mt-6">
+                Don't have an account?{" "}
+                <span onClick={() => navigate("/signup")} className="text-primary font-semibold hover:underline cursor-pointer">Sign up</span>
+              </p>
             </div>
           </div>
-
-          {/* Remember Me */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              margin: "14px 0 18px",
-              cursor: "pointer",
-            }}
-            onClick={() => setRemember(!remember)}
-          >
-            <div
-              style={{
-                width: "16px",
-                height: "16px",
-                borderRadius: "4px",
-                border: remember ? "none" : "0.5px solid #d1d5db",
-                background: remember ? "#1a1a1a" : "#f9fafb",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                transition: "all 0.15s ease",
-              }}
-            >
-              {remember && (
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="2 6 5 9 10 3" />
-                </svg>
-              )}
-            </div>
-            <span style={{ fontSize: "13px", color: "#6b7280" }}>
-              Remember me for 30 days
-            </span>
-          </div>
-
-          {/* Login Button */}
-          <button
-            onClick={handleLogin}
-            style={{
-              width: "100%",
-              padding: "10px",
-              background: "#1a1a1a",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "14px",
-              fontWeight: 500,
-              cursor: "pointer",
-              letterSpacing: "0.01em",
-              transition: "opacity 0.15s ease",
-            }}
-            onMouseEnter={(e) => (e.target.style.opacity = "0.85")}
-            onMouseLeave={(e) => (e.target.style.opacity = "1")}
-          >
-            Sign in
-          </button>
-
-          {/* Sign Up Link */}
-          <p
-            style={{
-              textAlign: "center",
-              fontSize: "13px",
-              color: "#6b7280",
-              margin: "1.25rem 0 0",
-            }}
-          >
-            Don't have an account?{" "}
-            <span
-              onClick={() => navigate("/signup")}
-              style={{
-                color: "#4f46e5",
-                cursor: "pointer",
-                fontWeight: 500,
-              }}
-            >
-              Sign up
-            </span>
-          </p>
         </div>
       </AuthLayout>
     </div>

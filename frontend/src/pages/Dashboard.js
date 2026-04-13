@@ -175,15 +175,16 @@ function Dashboard() {
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              background: "rgba(255,255,255,0.06)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              borderRadius: "20px",
+              background: "rgba(18, 18, 23, 0.75)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+              borderRadius: "24px",
               padding: "0",
-              border: "0.5px solid rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5)",
               display: "flex",
               flexDirection: "column",
-              height: "80vh",
+              height: "85vh",
               position: "relative",
               overflow: "hidden",
             }}
@@ -246,7 +247,7 @@ function Dashboard() {
             </div>
 
             {/* CHAT */}
-            <div style={{ flex: 1, overflow: "hidden", padding: "0 4px" }}>
+            <div style={{ flex: 1, overflow: "hidden", padding: "16px 24px 24px", display: "flex", flexDirection: "column", zIndex: 10 }}>
               <ChatBox />
             </div>
 

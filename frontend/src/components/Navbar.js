@@ -35,7 +35,10 @@ function Navbar() {
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4">
 
       {/* LEFT */}
-      <Link to="/" className="text-lg font-semibold text-white">
+      <Link to="/" className="text-2xl font-bold text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.8)] tracking-tight flex items-center gap-2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
         DocuMind
       </Link>
 
@@ -73,25 +76,21 @@ function Navbar() {
 
         {/* DASHBOARD */}
         {user && !isAuthPage && (
-          <>
+          <div className="flex items-center gap-6">
             <button
               onClick={() => navigate("/settings")}
-              className="text-gray-300 hover:text-white"
+              className="text-gray-300 font-medium hover:text-white transition-colors"
             >
               Settings
             </button>
 
-            <div className="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-semibold">
-              {getInitials()}
-            </div>
-
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 px-4 py-2 rounded text-white"
+            <button 
+              onClick={() => navigate("/dashboard")}
+              className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-green-400 text-black flex items-center justify-center font-bold text-sm shadow-[0_0_15px_rgba(74,222,128,0.4)] hover:scale-105 transition-transform"
             >
-              Logout
+              {getInitials()}
             </button>
-          </>
+          </div>
         )}
 
         {/* NOT LOGGED IN */}
