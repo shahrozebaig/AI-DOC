@@ -23,6 +23,7 @@ function Settings() {
   // Delete state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
 
   // 🔥 MFA State
   const [mfaEnabled, setMfaEnabled] = useState(false);
@@ -264,6 +265,17 @@ function Settings() {
         const { error } = await supabase.auth.updateUser({ password: newPassword });
         if (error) throw error;
         alert("Password updated! Please login again.");
+      } else if (stepUpAction === "account deletion") {
+        const res = await fetch("http://localhost:8000/user/delete-account/", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id }),
+        });
+        const data = await res.json();
+        alert(data.message);
+        await signOut();
+        window.location.href = "/";
+        return;
       }
 
       await signOut();
@@ -310,9 +322,34 @@ function Settings() {
     if (deleteConfirmText !== "DELETE") {
       return alert("You must type DELETE to confirm.");
     }
+    if (!deletePassword) {
+      return alert("Please enter your current password to confirm deletion.");
+    }
 
+    setMfaLoading(true);
+
+    // 🔥 1. Re-authenticate
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: deletePassword,
+    });
+
+    if (loginError) {
+      setMfaLoading(false);
+      return alert("Current password is incorrect.");
+    }
+
+    // 🔥 2. Check MFA
+    if (mfaEnabled && mfaUnenrollFactorId) {
+      setStepUpAction("account deletion");
+      setMfaSetupStep("verifyStepUp");
+      setMfaLoading(false);
+      return;
+    }
+
+    // 🔥 3. Proceed if no MFA
     try {
-      const res = await fetch("http://localhost:8000/user/delete-account", {
+      const res = await fetch("http://localhost:8000/user/delete-account/", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id }),
@@ -325,6 +362,8 @@ function Settings() {
       window.location.href = "/";
     } catch {
       alert("Error deleting account");
+    } finally {
+      setMfaLoading(false);
     }
   };
 
@@ -596,24 +635,42 @@ function Settings() {
               </button>
             ) : (
               <div className="bg-red-950/40 border border-red-500/30 rounded-xl p-5 space-y-4">
-                <p className="text-red-300 text-sm">
-                  This action cannot be undone. Please type <strong className="text-white bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">DELETE</strong> to confirm.
-                </p>
-                <input
-                  type="text"
-                  placeholder="Type DELETE"
-                  value={deleteConfirmText}
-                  onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  className="w-full p-3 bg-black/60 text-white rounded-xl outline-none border-2 border-transparent focus:border-red-500 transition-colors"
-                />
-                <div className="flex gap-3">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-red-300 text-sm mb-1.5 ml-1">
+                      Type <strong className="text-white bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">DELETE</strong> to confirm.
+                    </p>
+                    <input
+                      type="text"
+                      placeholder="Type DELETE"
+                      value={deleteConfirmText}
+                      onChange={(e) => setDeleteConfirmText(e.target.value)}
+                      className="w-full p-3 bg-black/60 text-white rounded-xl outline-none border-2 border-transparent focus:border-red-500 transition-colors"
+                    />
+                  </div>
+                  
+                  <div>
+                    <p className="text-red-300 text-sm mb-1.5 ml-1">
+                      Current Password
+                    </p>
+                    <input
+                      type="password"
+                      placeholder="Enter password to confirm"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      className="w-full p-3 bg-black/60 text-white rounded-xl outline-none border-2 border-transparent focus:border-red-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-2">
                   <button
                     onClick={deleteAccount}
-                    disabled={deleteConfirmText !== "DELETE"}
-                    className={`flex-1 py-3 rounded-xl text-white font-medium transition-all ${deleteConfirmText === "DELETE" ? "bg-red-600 hover:bg-red-500 active:scale-[0.98]" : "bg-red-900/50 cursor-not-allowed opacity-50"
+                    disabled={deleteConfirmText !== "DELETE" || !deletePassword || mfaLoading}
+                    className={`flex-1 py-3 rounded-xl text-white font-medium transition-all ${deleteConfirmText === "DELETE" && deletePassword ? "bg-red-600 hover:bg-red-500 active:scale-[0.98]" : "bg-red-900/50 cursor-not-allowed opacity-50"
                       }`}
                   >
-                    Confirm Delete
+                    {mfaLoading ? "Confirming..." : "Confirm Delete"}
                   </button>
                   <button
                     onClick={() => {
