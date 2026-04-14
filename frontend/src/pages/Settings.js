@@ -35,6 +35,7 @@ function Settings() {
   const [mfaVerifyError, setMfaVerifyError] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
   const [mfaLoading, setMfaLoading] = useState(false);
+  const [stepUpAction, setStepUpAction] = useState(null); // 'email' or 'password'
 
   useEffect(() => {
     const checkMFA = async () => {
@@ -70,19 +71,31 @@ function Settings() {
     if (!email) return setEmailError("email");
     if (!emailPassword) return setEmailError("emailPassword");
     setEmailError("");
+    setMfaLoading(true);
 
-    // 🔥 re-authenticate user
+    // 🔥 1. re-authenticate user
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: emailPassword,
     });
 
     if (loginError) {
+      setMfaLoading(false);
       setEmailError("emailPassword");
       return alert("Current password is incorrect");
     }
 
+    // 🔥 2. Check if MFA is enabled - if so, we need AAL2 (Step-up)
+    if (mfaEnabled && mfaUnenrollFactorId) {
+      setStepUpAction("email");
+      setMfaSetupStep("verifyStepUp");
+      setMfaLoading(false);
+      return;
+    }
+
+    // 🔥 3. Proceed if no MFA
     const { error } = await supabase.auth.updateUser({ email });
+    setMfaLoading(false);
 
     if (error) alert(error.message);
     else {
@@ -97,22 +110,33 @@ function Settings() {
     if (!currentPassword) return setPasswordError("currentPassword");
     if (!newPassword) return setPasswordError("newPassword");
     setPasswordError("");
+    setMfaLoading(true);
 
-    // 🔥 re-authenticate user
+    // 🔥 1. re-authenticate user
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: currentPassword,
     });
 
     if (loginError) {
+      setMfaLoading(false);
       setPasswordError("currentPassword");
       return alert("Current password is incorrect");
     }
 
-    // 🔥 update password
+    // 🔥 2. Check if MFA is enabled - if so, we need AAL2 (Step-up)
+    if (mfaEnabled && mfaUnenrollFactorId) {
+      setStepUpAction("password");
+      setMfaSetupStep("verifyStepUp");
+      setMfaLoading(false);
+      return;
+    }
+
+    // 🔥 3. proceed if no MFA
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
     });
+    setMfaLoading(false);
 
     if (error) alert(error.message);
     else {
@@ -206,6 +230,44 @@ function Settings() {
       setMfaEnabled(true);
       setMfaUnenrollFactorId(mfaFactorId);
       cancelMfaSetup();
+    } catch (err) {
+      setMfaVerifyError("Invalid code");
+      alert(err.message);
+    } finally {
+      setMfaLoading(false);
+    }
+  };
+
+  const confirmStepUp = async () => {
+    if (!mfaVerifyCode) return setMfaVerifyError("Required");
+    setMfaVerifyError("");
+    setMfaLoading(true);
+
+    try {
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaUnenrollFactorId });
+      if (challengeError) throw challengeError;
+
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: mfaUnenrollFactorId,
+        challengeId: challengeData.id,
+        code: mfaVerifyCode
+      });
+
+      if (verifyError) throw verifyError;
+
+      // Now at AAL2, perform the pending action
+      if (stepUpAction === "email") {
+        const { error } = await supabase.auth.updateUser({ email });
+        if (error) throw error;
+        alert("Email updated! Please login again.");
+      } else if (stepUpAction === "password") {
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        alert("Password updated! Please login again.");
+      }
+
+      await signOut();
+      window.location.href = "/login";
     } catch (err) {
       setMfaVerifyError("Invalid code");
       alert(err.message);
@@ -569,6 +631,51 @@ function Settings() {
 
         </div>
       </div>
+
+      {/* 🔥 STEP-UP MFA MODAL */}
+      {mfaSetupStep === "verifyStepUp" && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#111] border border-white/10 w-full max-w-md rounded-2xl p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mb-2">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              </div>
+              <h3 className="text-xl font-bold text-white">Security Verification</h3>
+              <p className="text-sm text-gray-400">Please enter the 6-digit code from your authenticator app to authorize this {stepUpAction} change.</p>
+              
+              <div className="w-full pt-4">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="000000"
+                  maxLength={6}
+                  className={`w-full p-4 bg-black text-white text-center tracking-[0.5em] font-mono text-2xl rounded-xl border-2 transition-all outline-none ${mfaVerifyError ? "border-red-500" : "border-white/10 focus:border-purple-500"}`}
+                  onChange={(e) => { setMfaVerifyCode(e.target.value.replace(/[^0-9]/g, '')); setMfaVerifyError(""); }}
+                  value={mfaVerifyCode}
+                  onKeyDown={(e) => e.key === 'Enter' && confirmStepUp()}
+                />
+                {mfaVerifyError && <p className="text-red-500 text-xs mt-2">{mfaVerifyError}</p>}
+              </div>
+
+              <div className="flex gap-3 w-full pt-6">
+                <button 
+                  onClick={confirmStepUp} 
+                  disabled={mfaLoading}
+                  className="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50"
+                >
+                  {mfaLoading ? "Verifying..." : "Confirm Change"}
+                </button>
+                <button 
+                  onClick={() => { setMfaSetupStep("idle"); setStepUpAction(null); setMfaVerifyCode(""); }} 
+                  className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-3 rounded-xl border border-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
