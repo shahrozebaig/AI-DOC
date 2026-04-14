@@ -1,7 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { signOut } from "../services/auth";
 
 function Navbar() {
   const { user } = useContext(AuthContext);
@@ -12,11 +11,6 @@ function Navbar() {
     location.pathname === "/login" || location.pathname === "/signup";
 
   const isLandingPage = location.pathname === "/";
-
-  const handleLogout = async () => {
-    await signOut();
-    window.location.href = "/";
-  };
 
   const getInitials = () => {
     if (!user?.email) return "U";

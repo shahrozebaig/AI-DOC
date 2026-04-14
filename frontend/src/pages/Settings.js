@@ -39,7 +39,7 @@ function Settings() {
   useEffect(() => {
     const checkMFA = async () => {
       if (!user) return;
-      const { data, error } = await supabase.auth.mfa.listFactors();
+      const { data } = await supabase.auth.mfa.listFactors();
       
       let verifiedFactor = null;
       if (data && Array.isArray(data.all)) {
@@ -190,7 +190,7 @@ function Settings() {
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
       if (challengeError) throw challengeError;
 
-      const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
+      const { error: verifyError } = await supabase.auth.mfa.verify({
         factorId: mfaFactorId,
         challengeId: challengeData.id,
         code: mfaVerifyCode

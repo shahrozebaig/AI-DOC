@@ -86,7 +86,7 @@ function Login() {
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
       if (challengeError) throw challengeError;
 
-      const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
+      const { error: verifyError } = await supabase.auth.mfa.verify({
         factorId: mfaFactorId,
         challengeId: challengeData.id,
         code: mfaCode
