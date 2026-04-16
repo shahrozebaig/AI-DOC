@@ -259,32 +259,12 @@ function Login() {
 
                 <div className="mb-6">
                   <button
-                    onClick={async () => {
+                    onClick={() => {
                         if (!email) {
                             showToast("Please enter your email address first to use Face ID login.");
                             return;
                         }
-                        
-                        // Check if Face ID is set up
-                        try {
-                            const { data, error } = await supabase
-                                .from("face_auth")
-                                .select("id")
-                                .eq("email", email)
-                                .maybeSingle();
-                            
-                            if (error) throw error;
-                            
-                            if (!data) {
-                                showToast("Face ID is not set up for this account. Please log in with your password first.");
-                                return;
-                            }
-                            
-                            setIsFaceModalOpen(true);
-                        } catch (err) {
-                            console.error("Error checking Face ID status:", err);
-                            setIsFaceModalOpen(true); // Fallback to modal if check fails
-                        }
+                        setIsFaceModalOpen(true);
                     }}
                     className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-[0.98]"
                   >

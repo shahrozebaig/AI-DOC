@@ -86,11 +86,7 @@ async def login_face(req: FaceLoginRequest):
         matches = face_recognition.compare_faces([stored_encoding], current_encoding, tolerance=0.5)
         
         if matches[0]:
-            service_role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-            from supabase import create_client
-            admin_client = create_client(os.getenv("SUPABASE_URL"), service_role_key)
-            
-            link_response = admin_client.auth.admin.generate_link({
+            link_response = supabase.auth.admin.generate_link({
                 "type": "magiclink",
                 "email": req.email,
                 "options": {
