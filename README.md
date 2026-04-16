@@ -2,122 +2,90 @@
 
 ## Overview
 
-DocuMind AI is an intelligent document-based conversational system designed to transform how users interact with unstructured data. It enables users to upload documents such as PDFs and extract meaningful insights through natural language queries. By leveraging Retrieval-Augmented Generation (RAG) combined with large language models (LLMs), the system delivers precise, context-aware responses grounded in user-provided data.
+DocuMind AI is an advanced document-based conversational platform that enables users to upload files such as PDFs and interact with them using natural language queries. Built using Retrieval-Augmented Generation (RAG) and large language models, the system delivers accurate, context-aware responses derived directly from user-provided documents.
 
----
-
-## Problem Statement
-
-Traditional document analysis is time-consuming, inefficient, and often requires manual effort to locate relevant information. Existing tools either lack contextual understanding or rely on generic datasets, making them unsuitable for personalized knowledge retrieval.
-
-DocuMind AI addresses this gap by enabling intelligent querying over user-specific documents with high accuracy and speed.
+The platform is designed to simplify information retrieval, enhance productivity, and provide a secure, intelligent interface for working with large volumes of unstructured data.
 
 ---
 
 ## Key Features
 
-* Document ingestion and processing for structured querying
+### Document Intelligence
+
+* Upload and process large PDF documents efficiently
+* Handles large-scale documents with optimized chunking
 * Context-aware question answering using RAG architecture
+* High-relevance retrieval with improved semantic search
+
+### Interactive Chat System
+
 * Real-time conversational interface
-* Secure authentication and user management
-* Support for multiple authentication methods (email, OAuth)
-* Scalable backend for handling multiple documents and queries
-* Clean and responsive user interface
+* Accurate responses grounded in document context
+* Enhanced retrieval using optimized similarity search
+
+### File Handling
+
+* Drag-and-drop file upload support
+* Seamless document ingestion pipeline
+* Automatic indexing and processing
 
 ---
 
-## Use Cases
+## Security Features
 
-* Academic research and study assistance
-* Legal and compliance document analysis
-* Business intelligence and report summarization
-* Developer documentation querying
-* Knowledge management for teams and organizations
+DocuMind AI is built with strong user security and account management capabilities:
 
----
-
-## Why It Is Useful
-
-* Reduces time spent reading and analyzing large documents
-* Enables instant retrieval of relevant information
-* Improves productivity and decision-making efficiency
-* Provides personalized insights based on user data
-* Eliminates dependency on generic search tools
-* Enhances accessibility of complex information
+* Two-Factor Authentication (2FA) using 6-digit OTP (Authenticator-based)
+* Email-based password reset (Forgot Password)
+* Secure account deletion via backend API
+* Protected routes for authenticated users only
+* Session-based authentication using Supabase
+* OAuth login support (Google and GitHub)
 
 ---
 
-## System Workflow
+## How to Use
 
-1. **User Authentication**
-   Users sign up or log in via email or OAuth providers.
+1. **Create an Account / Login**
+   Sign up using email or log in via Google/GitHub authentication.
 
-2. **Document Upload**
-   Users upload documents which are processed and indexed.
+2. **Upload Document**
+   Upload a PDF file using file selection or drag-and-drop.
 
-3. **Embedding Generation**
-   Documents are converted into vector representations for semantic search.
+3. **Ask Questions**
+   Enter queries related to the uploaded document.
 
-4. **Query Processing**
-   User queries are matched against document embeddings.
+4. **Receive Responses**
+   The system retrieves relevant content and generates accurate answers.
 
-5. **Response Generation**
-   The LLM generates context-aware answers using retrieved data.
+5. **Enhanced Security (Optional)**
+   Enable 2FA for additional account protection.
 
-6. **Result Delivery**
-   Responses are displayed in a conversational interface.
-
----
-
-## What Makes It Distinct
-
-* Combines retrieval and generation for higher accuracy
-* Operates entirely on user-provided data, ensuring relevance
-* Optimized for low-latency inference using Groq infrastructure
-* Modular architecture enabling scalability and extensibility
-* Separation of concerns between frontend, backend, and AI pipeline
-* Designed with production-ready authentication and security practices
+6. **Manage Account Settings**
+   Update email, password, or delete account securely.
 
 ---
 
 ## Technical Architecture
 
-The system follows a modern full-stack architecture:
+DocuMind AI follows a modular full-stack architecture:
 
-* Frontend handles user interaction and UI rendering
-* Backend manages API logic, document processing, and routing
+* Frontend handles UI/UX and user interaction
+* Backend manages APIs, document processing, and business logic
 * AI layer performs embedding, retrieval, and response generation
-* Database and authentication are handled via a managed backend service
+* Authentication and database services are managed via Supabase
 
 ---
 
 ## Tech Stack
 
-| Layer        | Technology Used                       |
-| ------------ | ------------------------------------- |
-| Frontend     | React.js, Tailwind CSS                |
-| Backend      | FastAPI (Python)                      |
-| AI Model     | Groq LLaMA 3.1 8B Instant             |
-| RAG Engine   | LlamaIndex                            |
-| Embeddings   | HuggingFace Transformers              |
-| Vector Store | FAISS                                 |
-| Database     | Supabase                              |
-| Auth         | Supabase Auth (Email, Google, GitHub) |
-| Deployment   | Render / Railway / Vercel (Frontend)  |
-
----
-
-## Scalability and Future Enhancements
-
-* Persistent vector storage for long-term document retention
-* Multi-document querying and context merging
-* Chat history and session management
-* Streaming responses for improved user experience
-* Role-based access control for enterprise use
-* Integration with external data sources and APIs
-
----
-
-## Conclusion
-
-DocuMind AI provides a robust and scalable solution for intelligent document interaction. By combining modern AI techniques with a clean full-stack architecture, it enables efficient knowledge retrieval and enhances how users work with information.
+| Layer        | Technology Used                                 |
+| ------------ | ----------------------------------------------- |
+| Frontend     | React.js, Tailwind CSS                          |
+| Backend      | FastAPI (Python)                                |
+| AI Model     | Groq LLaMA 3.1 8B Instant                       |
+| RAG Engine   | LlamaIndex                                      |
+| Vector Store | FAISS                                           |
+| Database     | Supabase                                        |
+| Auth         | Supabase Auth (Email, Google, GitHub, 2FA)      |
+| Security     | OTP-based 2FA, Password Reset, Account Deletion |

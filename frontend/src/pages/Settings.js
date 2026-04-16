@@ -8,26 +8,18 @@ import { signOut } from "../services/auth";
 function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  // Email state
   const [email, setEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
   const [emailError, setEmailError] = useState("");
-
-  // Password state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // Delete state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
-
-  // 🔥 MFA State
   const [mfaEnabled, setMfaEnabled] = useState(false);
-  const [mfaSetupStep, setMfaSetupStep] = useState("idle"); // idle, askPassword, showQR
+  const [mfaSetupStep, setMfaSetupStep] = useState("idle"); 
   const [mfaPassword, setMfaPassword] = useState("");
   const [mfaPasswordError, setMfaPasswordError] = useState("");
   const [mfaQrCode, setMfaQrCode] = useState("");
@@ -36,7 +28,7 @@ function Settings() {
   const [mfaVerifyError, setMfaVerifyError] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
   const [mfaLoading, setMfaLoading] = useState(false);
-  const [stepUpAction, setStepUpAction] = useState(null); // 'email' or 'password'
+  const [stepUpAction, setStepUpAction] = useState(null); 
 
   useEffect(() => {
     const checkMFA = async () => {
@@ -67,14 +59,12 @@ function Settings() {
     checkMFA();
   }, [user]);
 
-  // 🔥 UPDATE EMAIL
   const updateEmail = async () => {
     if (!email) return setEmailError("email");
     if (!emailPassword) return setEmailError("emailPassword");
     setEmailError("");
     setMfaLoading(true);
 
-    // 🔥 1. re-authenticate user
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: emailPassword,
@@ -86,7 +76,6 @@ function Settings() {
       return alert("Current password is incorrect");
     }
 
-    // 🔥 2. Check if MFA is enabled - if so, we need AAL2 (Step-up)
     if (mfaEnabled && mfaUnenrollFactorId) {
       setStepUpAction("email");
       setMfaSetupStep("verifyStepUp");
@@ -94,7 +83,6 @@ function Settings() {
       return;
     }
 
-    // 🔥 3. Proceed if no MFA
     const { error } = await supabase.auth.updateUser({ email });
     setMfaLoading(false);
 
@@ -106,14 +94,12 @@ function Settings() {
     }
   };
 
-  // 🔥 UPDATE PASSWORD (WITH CONFIRM)
   const updatePassword = async () => {
     if (!currentPassword) return setPasswordError("currentPassword");
     if (!newPassword) return setPasswordError("newPassword");
     setPasswordError("");
     setMfaLoading(true);
 
-    // 🔥 1. re-authenticate user
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: currentPassword,
@@ -125,7 +111,6 @@ function Settings() {
       return alert("Current password is incorrect");
     }
 
-    // 🔥 2. Check if MFA is enabled - if so, we need AAL2 (Step-up)
     if (mfaEnabled && mfaUnenrollFactorId) {
       setStepUpAction("password");
       setMfaSetupStep("verifyStepUp");
@@ -133,7 +118,6 @@ function Settings() {
       return;
     }
 
-    // 🔥 3. proceed if no MFA
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
     });
@@ -147,10 +131,8 @@ function Settings() {
     }
   };
 
-  // 🔥 MFA Handlers
   const handleEnableMfaClick = async () => {
     if (mfaUnenrollFactorId) {
-      // Re-enable existing factor
       setMfaLoading(true);
       const { error } = await supabase.auth.updateUser({
         data: { is_mfa_enabled: true }
@@ -222,8 +204,6 @@ function Settings() {
       });
 
       if (verifyError) throw verifyError;
-
-      // Update user metadata to clearly mark it enabled
       await supabase.auth.updateUser({
         data: { is_mfa_enabled: true }
       });
@@ -255,8 +235,6 @@ function Settings() {
       });
 
       if (verifyError) throw verifyError;
-
-      // Now at AAL2, perform the pending action
       if (stepUpAction === "email") {
         const { error } = await supabase.auth.updateUser({ email });
         if (error) throw error;
@@ -317,7 +295,6 @@ function Settings() {
     }
   };
 
-  // 🔥 DELETE ACCOUNT
   const deleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") {
       return alert("You must type DELETE to confirm.");
@@ -328,7 +305,6 @@ function Settings() {
 
     setMfaLoading(true);
 
-    // 🔥 1. Re-authenticate
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: deletePassword,
@@ -339,7 +315,6 @@ function Settings() {
       return alert("Current password is incorrect.");
     }
 
-    // 🔥 2. Check MFA
     if (mfaEnabled && mfaUnenrollFactorId) {
       setStepUpAction("account deletion");
       setMfaSetupStep("verifyStepUp");
@@ -347,7 +322,6 @@ function Settings() {
       return;
     }
 
-    // 🔥 3. Proceed if no MFA
     try {
       const res = await fetch("http://localhost:8000/user/delete-account/", {
         method: "DELETE",

@@ -7,8 +7,6 @@ function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // MFA State
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaError, setMfaError] = useState("");
@@ -47,7 +45,6 @@ function ResetPassword() {
     setLoading(true);
 
     try {
-      // 1. If MFA enabled, verify code first (AAL2 Step-up)
       if (mfaEnabled) {
         const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
         if (challengeError) throw challengeError;
@@ -61,7 +58,6 @@ function ResetPassword() {
         if (verifyError) throw verifyError;
       }
 
-      // 2. Perform password update
       const { error } = await supabase.auth.updateUser({
         password,
       });
@@ -164,4 +160,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default ResetPassword;

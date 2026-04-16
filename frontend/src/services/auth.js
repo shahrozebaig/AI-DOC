@@ -1,6 +1,4 @@
 import { supabase } from "../lib/supabaseClient";
-
-// EMAIL SIGNUP
 export const signUp = async (email, password) => {
   return await supabase.auth.signUp({
     email,
@@ -8,7 +6,6 @@ export const signUp = async (email, password) => {
   });
 };
 
-// EMAIL LOGIN
 export const signIn = async (email, password) => {
   return await supabase.auth.signInWithPassword({
     email,
@@ -16,12 +13,10 @@ export const signIn = async (email, password) => {
   });
 };
 
-// LOGOUT
 export const signOut = async () => {
   return await supabase.auth.signOut();
 };
 
-// 🔥 GOOGLE LOGIN
 export const signInWithGoogle = async () => {
   return await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -31,7 +26,6 @@ export const signInWithGoogle = async () => {
   });
 };
 
-// 🔥 GITHUB LOGIN
 export const signInWithGithub = async () => {
   return await supabase.auth.signInWithOAuth({
     provider: "github",
@@ -41,14 +35,12 @@ export const signInWithGithub = async () => {
   });
 };
 
-// 🔥 FORGOT PASSWORD
 export const resetPassword = async (email) => {
   return await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: "http://localhost:3000/reset-password",
   });
 };
 
-// 🔥 UPDATE PASSWORD (AFTER EMAIL LINK)
 export const updatePassword = async (newPassword) => {
   return await supabase.auth.updateUser({
     password: newPassword,

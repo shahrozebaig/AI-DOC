@@ -5,7 +5,7 @@ import MessageBubble from "./MessageBubble";
 function ChatBox() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
-  const [loading, setLoading] = useState(false); // 🔥 typing state
+  const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -19,7 +19,6 @@ function ChatBox() {
     }
   };
 
-  // 🔥 VOICE COMMAND
   const startListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -32,8 +31,6 @@ function ChatBox() {
     recognition.interimResults = true;
 
     recognition.onstart = () => setIsListening(true);
-    
-    // Some browsers fire onend when speech stops, we also flip state here just in case
     recognition.onend = () => setIsListening(false);
     
     recognition.onresult = (e) => {
@@ -57,13 +54,12 @@ function ChatBox() {
     const userMessage = message;
     setMessage("");
 
-    // ✅ Add user message
     setChat((prev) => [
       ...prev,
       { text: userMessage, isUser: true },
     ]);
 
-    setLoading(true); // 🔥 show typing
+    setLoading(true); 
 
     try {
       const res = await sendMessage(userMessage);
@@ -82,13 +78,11 @@ function ChatBox() {
     setLoading(false);
   };
 
-  // 🔥 ENTER KEY SEND
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
       
-      // Reset height after sending
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
