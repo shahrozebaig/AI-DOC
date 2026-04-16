@@ -12,3 +12,6 @@ transformers
 sentence-transformers
 numpy
 tabulate
+dlib-bin
+face-recognition
+opencv-python-headless

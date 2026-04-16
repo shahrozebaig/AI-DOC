@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 import { supabase } from "../lib/supabaseClient";
+import FaceAuthModal from "../components/FaceAuthModal";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ function Login() {
   const [mfaCode, setMfaCode] = useState("");
   const [mfaError, setMfaError] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState("");
+  const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -38,7 +40,7 @@ function Login() {
         const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
         if (mfaData && mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
           const { data: factorsData } = await supabase.auth.mfa.listFactors();
-          
+
           let verifiedFactor = null;
           if (factorsData && Array.isArray(factorsData.all)) {
             verifiedFactor = factorsData.all.find(f => f.status === 'verified' && f.factor_type === 'totp');
@@ -134,7 +136,7 @@ function Login() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Two-Factor Authentication</h2>
                   <p className="text-sm text-gray-500">Your account is protected with 2FA. Please enter the generated code from your authenticator app to continue.</p>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Authentication Code</label>
                   <input
@@ -155,10 +157,10 @@ function Login() {
                 >
                   Verify code
                 </button>
-                
+
                 <button
-                   onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }}
-                   className="text-sm text-gray-500 font-medium hover:text-black transition-colors"
+                  onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }}
+                  className="text-sm text-gray-500 font-medium hover:text-black transition-colors"
                 >
                   Sign Out
                 </button>
@@ -179,13 +181,28 @@ function Login() {
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" />
                     Google
                   </button>
-
                   <button
                     onClick={signInWithGithub}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700"
                   >
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="github" className="w-4 h-4" />
                     GitHub
+                  </button>
+                </div>
+
+                <div className="mb-6">
+                  <button
+                    onClick={() => {
+                        if (!email) {
+                            alert("Please enter your email address first to use Face ID login.");
+                            return;
+                        }
+                        setIsFaceModalOpen(true);
+                    }}
+                    className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-[0.98]"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Sign in with Face ID
                   </button>
                 </div>
 
@@ -258,6 +275,22 @@ function Login() {
           </div>
         </div>
       </AuthLayout>
+
+      <FaceAuthModal
+        isOpen={isFaceModalOpen}
+        onClose={() => setIsFaceModalOpen(false)}
+        mode="login"
+        userEmail={email}
+        onSuccess={(data) => {
+          if (data.action_link) {
+            window.location.href = data.action_link;
+          } else if (data.verified) {
+            // If action_link not available, we can't easily sign in without password 
+            // unless we have a custom token. For now, show alert message.
+            alert("Face verified! (In a production app, this would automatically log you in)");
+          }
+        }}
+      />
     </div>
   );
 }

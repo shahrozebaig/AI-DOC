@@ -4,10 +4,16 @@ import Navbar from "../components/Navbar";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
+import FaceAuthModal from "../components/FaceAuthModal";
 
 function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
+  const [faceIdEnabled, setFaceIdEnabled] = useState(false);
+  const [faceIdLoading, setFaceIdLoading] = useState(false);
+  const [showFaceDisableConfirm, setShowFaceDisableConfirm] = useState(false);
+  const [faceDisablePassword, setFaceDisablePassword] = useState("");
   const [email, setEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -19,7 +25,7 @@ function Settings() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
   const [mfaEnabled, setMfaEnabled] = useState(false);
-  const [mfaSetupStep, setMfaSetupStep] = useState("idle"); 
+  const [mfaSetupStep, setMfaSetupStep] = useState("idle");
   const [mfaPassword, setMfaPassword] = useState("");
   const [mfaPasswordError, setMfaPasswordError] = useState("");
   const [mfaQrCode, setMfaQrCode] = useState("");
@@ -28,13 +34,13 @@ function Settings() {
   const [mfaVerifyError, setMfaVerifyError] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
   const [mfaLoading, setMfaLoading] = useState(false);
-  const [stepUpAction, setStepUpAction] = useState(null); 
+  const [stepUpAction, setStepUpAction] = useState(null);
 
   useEffect(() => {
     const checkMFA = async () => {
       if (!user) return;
       const { data } = await supabase.auth.mfa.listFactors();
-      
+
       let verifiedFactor = null;
       if (data && Array.isArray(data.all)) {
         verifiedFactor = data.all.find(f => f.status === 'verified' && f.factor_type === 'totp');
@@ -57,6 +63,14 @@ function Settings() {
       }
     };
     checkMFA();
+
+    const checkFaceId = async () => {
+      if (!user) return;
+      const { data } = await supabase.from("face_auth").select("id").eq("user_id", user.id).maybeSingle();
+      if (data) setFaceIdEnabled(true);
+      else setFaceIdEnabled(false);
+    };
+    checkFaceId();
   }, [user]);
 
   const updateEmail = async () => {
@@ -288,10 +302,10 @@ function Settings() {
 
     setMfaLoading(false);
     if (error) {
-       alert("Error disabling 2FA: " + error.message);
+      alert("Error disabling 2FA: " + error.message);
     } else {
-       setMfaEnabled(false);
-       cancelMfaSetup();
+      setMfaEnabled(false);
+      cancelMfaSetup();
     }
   };
 
@@ -338,6 +352,35 @@ function Settings() {
       alert("Error deleting account");
     } finally {
       setMfaLoading(false);
+    }
+  };
+
+  const disableFaceId = async () => {
+    if (!faceDisablePassword) return alert("Please enter your current password.");
+    setFaceIdLoading(true);
+
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: faceDisablePassword,
+    });
+
+    if (loginError) {
+      setFaceIdLoading(false);
+      return alert("Current password is incorrect.");
+    }
+
+    try {
+      const { error } = await supabase.from("face_auth").delete().eq("user_id", user.id);
+      if (error) throw error;
+      
+      setFaceIdEnabled(false);
+      setShowFaceDisableConfirm(false);
+      setFaceDisablePassword("");
+      alert("Face ID has been disabled.");
+    } catch (err) {
+      alert("Error disabling Face ID: " + err.message);
+    } finally {
+      setFaceIdLoading(false);
     }
   };
 
@@ -469,6 +512,79 @@ function Settings() {
             </div>
           </div>
 
+          {/* 🎭 FACE ID SECTION */}
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all hover:bg-white/[0.07] flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Face ID Authentication</h3>
+                </div>
+              </div>
+              {faceIdEnabled ? (
+                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] uppercase tracking-wider font-bold rounded-full border border-emerald-500/20 flex items-center gap-1.5 animate-in fade-in transition-all">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div> Enabled
+                </span>
+              ) : (
+                <span className="px-3 py-1 bg-gray-500/10 text-gray-500 text-[10px] uppercase tracking-wider font-bold rounded-full border border-gray-500/20">Disabled</span>
+              )}
+            </div>
+
+            <p className="text-sm text-gray-400 mb-6 font-medium">
+              Enable biometric login using high-precision face recognition. This adds a futuristic and seamless way to access your vault.
+            </p>
+
+            <div className="mt-auto">
+              {!faceIdEnabled ? (
+                <button
+                  onClick={() => setIsFaceModalOpen(true)}
+                  className="w-full bg-emerald-600/90 text-white font-semibold py-4 rounded-xl hover:bg-emerald-500 transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                  Set Up Face Login
+                </button>
+              ) : showFaceDisableConfirm ? (
+                <div className="space-y-4 animate-in slide-in-from-bottom-2 duration-300">
+                  <div className="relative">
+                    <input
+                      type="password"
+                      placeholder="Confirm password to disable"
+                      className="w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 border-white/10 focus:border-red-500 transition-all"
+                      value={faceDisablePassword}
+                      onChange={(e) => setFaceDisablePassword(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && disableFaceId()}
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={disableFaceId}
+                      disabled={faceIdLoading}
+                      className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-500 transition-all disabled:opacity-50"
+                    >
+                      {faceIdLoading ? "Verifying..." : "Disable Face ID"}
+                    </button>
+                    <button
+                      onClick={() => setShowFaceDisableConfirm(false)}
+                      className="flex-1 bg-white/5 text-gray-400 py-3 rounded-xl hover:bg-white/10 transition-colors border border-white/10"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowFaceDisableConfirm(true)}
+                  className="w-full bg-white/5 text-gray-400 font-semibold py-4 rounded-xl hover:bg-white/10 hover:text-red-400 border border-white/10 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                  Disable Face ID
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* 🔐 TWO-FACTOR AUTHENTICATION SECTION */}
           <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all flex flex-col">
             <div className="flex items-center justify-between mb-4">
@@ -481,7 +597,7 @@ function Settings() {
                   <p className="text-xs text-gray-400 mt-0.5">Protect your account with an extra layer of security.</p>
                 </div>
               </div>
-              
+
               {mfaEnabled ? (
                 <span className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] uppercase tracking-wider font-bold rounded-full border border-green-500/20 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> Enabled</span>
               ) : (
@@ -517,7 +633,7 @@ function Settings() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <p className="text-sm text-gray-300 flex-1">Your account is currently protected by 2FA. You will be required to enter an OTP from your authenticator app each time you sign in.</p>
                     <button onClick={() => setMfaSetupStep('askPasswordDisable')} className="flex-shrink-0 px-5 py-2.5 bg-red-500/10 text-red-500 font-semibold rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/20 text-sm flex items-center justify-center gap-2">
-                       Disable 2FA
+                      Disable 2FA
                     </button>
                   </div>
                 )
@@ -571,17 +687,17 @@ function Settings() {
                           value={mfaVerifyCode}
                           onKeyDown={(e) => e.key === 'Enter' && confirmMfaSetup()}
                         />
-                          <button onClick={confirmMfaSetup} disabled={mfaLoading} className="px-5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-500 transition-all text-sm whitespace-nowrap disabled:opacity-50 shadow-[0_0_15px_rgba(147,51,234,0.2)]">
-                             {mfaLoading ? "Verifying..." : "Verify"}
-                          </button>
+                        <button onClick={confirmMfaSetup} disabled={mfaLoading} className="px-5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-500 transition-all text-sm whitespace-nowrap disabled:opacity-50 shadow-[0_0_15px_rgba(147,51,234,0.2)]">
+                          {mfaLoading ? "Verifying..." : "Verify"}
+                        </button>
                       </div>
                       {mfaVerifyError && <p className="text-red-400 text-xs mt-1.5">{mfaVerifyError}</p>}
                     </div>
                     <div className="pt-2">
-                       <button onClick={cancelMfaSetup} disabled={mfaLoading} className="text-xs text-gray-500 hover:text-white transition-colors flex items-center gap-1.5 underline">
-                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                         Cancel Setup
-                       </button>
+                      <button onClick={cancelMfaSetup} disabled={mfaLoading} className="text-xs text-gray-500 hover:text-white transition-colors flex items-center gap-1.5 underline">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        Cancel Setup
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -622,7 +738,7 @@ function Settings() {
                       className="w-full p-3 bg-black/60 text-white rounded-xl outline-none border-2 border-transparent focus:border-red-500 transition-colors"
                     />
                   </div>
-                  
+
                   <div>
                     <p className="text-red-300 text-sm mb-1.5 ml-1">
                       Current Password
@@ -673,7 +789,7 @@ function Settings() {
               </div>
               <h3 className="text-xl font-bold text-white">Security Verification</h3>
               <p className="text-sm text-gray-400">Please enter the 6-digit code from your authenticator app to authorize this {stepUpAction} change.</p>
-              
+
               <div className="w-full pt-4">
                 <input
                   autoFocus
@@ -689,15 +805,15 @@ function Settings() {
               </div>
 
               <div className="flex gap-3 w-full pt-6">
-                <button 
-                  onClick={confirmStepUp} 
+                <button
+                  onClick={confirmStepUp}
                   disabled={mfaLoading}
                   className="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50"
                 >
                   {mfaLoading ? "Verifying..." : "Confirm Change"}
                 </button>
-                <button 
-                  onClick={() => { setMfaSetupStep("idle"); setStepUpAction(null); setMfaVerifyCode(""); }} 
+                <button
+                  onClick={() => { setMfaSetupStep("idle"); setStepUpAction(null); setMfaVerifyCode(""); }}
                   className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-3 rounded-xl border border-white/10 transition-all"
                 >
                   Cancel
@@ -707,6 +823,18 @@ function Settings() {
           </div>
         </div>
       )}
+
+      <FaceAuthModal
+        isOpen={isFaceModalOpen}
+        onClose={() => setIsFaceModalOpen(false)}
+        mode="register"
+        userEmail={user?.email}
+        userId={user?.id}
+        onSuccess={() => {
+          setFaceIdEnabled(true);
+          alert("Face ID registered successfully!");
+        }}
+      />
     </div>
   );
 }
