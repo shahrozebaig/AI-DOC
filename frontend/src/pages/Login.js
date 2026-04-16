@@ -25,6 +25,9 @@ function Login() {
   const [mfaError, setMfaError] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState("");
   const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -100,10 +103,18 @@ function Login() {
   };
 
   const handleForgotPassword = async () => {
-    if (!email) return alert("Enter your email first");
+    if (!email) return setErrorField("email");
+    setErrorField("");
+    setResetLoading(true);
+    
     const { error } = await resetPassword(email);
-    if (error) alert(error.message);
-    else alert("Password reset link sent to your email!");
+    setResetLoading(false);
+    
+    if (error) {
+      alert(error.message);
+    } else {
+      setResetEmailSent(true);
+    }
   };
 
   return (
@@ -158,15 +169,62 @@ function Login() {
                   Verify code
                 </button>
 
-                <button
-                  onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }}
-                  className="text-sm text-gray-500 font-medium hover:text-black transition-colors"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <>
+                  <button
+                    onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }}
+                    className="text-sm text-gray-500 font-medium hover:text-black transition-colors"
+                  >
+                    Back to Login Page
+                  </button>
+                </div>
+              ) : isForgotPassword ? (
+                <div className="flex flex-col h-full justify-center">
+                  <div className="mb-8">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password</h2>
+                      <p className="text-sm text-gray-500">
+                          {resetEmailSent 
+                              ? "Check your inbox for a password reset link." 
+                              : "Enter your email and we'll send you a link to reset your password."}
+                      </p>
+                  </div>
+
+                  {!resetEmailSent ? (
+                      <div className="space-y-6">
+                          <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email Address</label>
+                              <input
+                                  type="email"
+                                  placeholder="you@example.com"
+                                  className={`w-full p-3.5 bg-gray-50 border rounded-xl outline-none transition-colors ${errorField === "email" ? "border-red-500" : "border-gray-200 focus:border-primary"}`}
+                                  value={email}
+                                  onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
+                                  onKeyDown={(e) => e.key === 'Enter' && handleForgotPassword()}
+                              />
+                          </div>
+
+                          <button
+                              onClick={handleForgotPassword}
+                              disabled={resetLoading}
+                              className="w-full bg-black text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition-colors active:scale-[0.98]"
+                          >
+                              {resetLoading ? "Sending..." : "Send Reset Link"}
+                          </button>
+                      </div>
+                  ) : (
+                      <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-emerald-700 text-sm mb-6 flex items-start gap-3">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                          <p>Success! We've sent a recovery link to <strong>{email}</strong>. Please check your spam folder if you don't see it.</p>
+                      </div>
+                  )}
+
+                  <button
+                      onClick={() => { setIsForgotPassword(false); setResetEmailSent(false); }}
+                      className="w-full text-gray-500 text-sm font-medium hover:text-black transition-colors mt-6 py-2 text-center"
+                  >
+                      Back to Login Page
+                  </button>
+                </div>
+              ) : (
+                <>
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
                   <p className="text-sm text-gray-500">Welcome back! Please enter your details.</p>
@@ -181,6 +239,7 @@ function Login() {
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" />
                     Google
                   </button>
+
                   <button
                     onClick={signInWithGithub}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700"
@@ -229,7 +288,7 @@ function Login() {
                   <div>
                     <div className="flex justify-between items-center mb-1.5 px-1">
                       <label className="text-sm font-medium text-gray-700">Password <span className="text-red-500">*</span></label>
-                      <span onClick={handleForgotPassword} className="text-xs text-primary font-semibold hover:underline cursor-pointer">Forgot password?</span>
+                      <span onClick={() => setIsForgotPassword(true)} className="text-xs text-primary font-semibold hover:underline cursor-pointer">Forgot password?</span>
                     </div>
                     <div className="relative">
                       <input
@@ -285,8 +344,6 @@ function Login() {
           if (data.action_link) {
             window.location.href = data.action_link;
           } else if (data.verified) {
-            // If action_link not available, we can't easily sign in without password 
-            // unless we have a custom token. For now, show alert message.
             alert("Face verified! (In a production app, this would automatically log you in)");
           }
         }}

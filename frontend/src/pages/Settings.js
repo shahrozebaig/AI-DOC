@@ -9,11 +9,6 @@ import FaceAuthModal from "../components/FaceAuthModal";
 function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
-  const [faceIdEnabled, setFaceIdEnabled] = useState(false);
-  const [faceIdLoading, setFaceIdLoading] = useState(false);
-  const [showFaceDisableConfirm, setShowFaceDisableConfirm] = useState(false);
-  const [faceDisablePassword, setFaceDisablePassword] = useState("");
   const [email, setEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -35,6 +30,13 @@ function Settings() {
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
   const [mfaLoading, setMfaLoading] = useState(false);
   const [stepUpAction, setStepUpAction] = useState(null);
+
+  // Face ID state
+  const [faceIdEnabled, setFaceIdEnabled] = useState(false);
+  const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
+  const [faceIdLoading, setFaceIdLoading] = useState(false);
+  const [showFaceDisableConfirm, setShowFaceDisableConfirm] = useState(false);
+  const [faceDisablePassword, setFaceDisablePassword] = useState("");
 
   useEffect(() => {
     const checkMFA = async () => {
@@ -61,16 +63,17 @@ function Settings() {
         setMfaEnabled(false);
         setMfaUnenrollFactorId("");
       }
+
+      // Check Face ID status
+      const { data: faceData } = await supabase
+        .from("face_auth")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      setFaceIdEnabled(!!faceData);
     };
     checkMFA();
-
-    const checkFaceId = async () => {
-      if (!user) return;
-      const { data } = await supabase.from("face_auth").select("id").eq("user_id", user.id).maybeSingle();
-      if (data) setFaceIdEnabled(true);
-      else setFaceIdEnabled(false);
-    };
-    checkFaceId();
   }, [user]);
 
   const updateEmail = async () => {
@@ -142,6 +145,36 @@ function Settings() {
       alert("Password updated! Please login again.");
       await signOut();
       window.location.href = "/login";
+    }
+  };
+
+  const disableFaceId = async () => {
+    if (!faceDisablePassword) return;
+    setFaceIdLoading(true);
+
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: faceDisablePassword,
+    });
+
+    if (loginError) {
+      setFaceIdLoading(false);
+      return alert("Incorrect password. Face ID cannot be disabled.");
+    }
+
+    const { error } = await supabase
+      .from("face_auth")
+      .delete()
+      .eq("user_id", user.id);
+
+    setFaceIdLoading(false);
+    if (error) {
+      alert("Error removing Face ID: " + error.message);
+    } else {
+      setFaceIdEnabled(false);
+      setShowFaceDisableConfirm(false);
+      setFaceDisablePassword("");
+      alert("Face ID has been successfully removed.");
     }
   };
 
@@ -355,35 +388,6 @@ function Settings() {
     }
   };
 
-  const disableFaceId = async () => {
-    if (!faceDisablePassword) return alert("Please enter your current password.");
-    setFaceIdLoading(true);
-
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: faceDisablePassword,
-    });
-
-    if (loginError) {
-      setFaceIdLoading(false);
-      return alert("Current password is incorrect.");
-    }
-
-    try {
-      const { error } = await supabase.from("face_auth").delete().eq("user_id", user.id);
-      if (error) throw error;
-      
-      setFaceIdEnabled(false);
-      setShowFaceDisableConfirm(false);
-      setFaceDisablePassword("");
-      alert("Face ID has been disabled.");
-    } catch (err) {
-      alert("Error disabling Face ID: " + err.message);
-    } finally {
-      setFaceIdLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-hero text-white pt-24 pb-12 relative overflow-hidden">
 
@@ -551,7 +555,7 @@ function Settings() {
                     <input
                       type="password"
                       placeholder="Confirm password to disable"
-                      className="w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 border-white/10 focus:border-red-500 transition-all"
+                      className="w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 border-white/10 focus:border-red-500 transition-all font-mono"
                       value={faceDisablePassword}
                       onChange={(e) => setFaceDisablePassword(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && disableFaceId()}
@@ -832,7 +836,8 @@ function Settings() {
         userId={user?.id}
         onSuccess={() => {
           setFaceIdEnabled(true);
-          alert("Face ID registered successfully!");
+          setIsFaceModalOpen(false);
+          alert("Face ID enabled successfully!");
         }}
       />
     </div>

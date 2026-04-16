@@ -85,10 +85,10 @@ function ResetPassword() {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
       <div className="bg-white/5 backdrop-blur-xl p-8 sm:p-10 rounded-[32px] w-full max-w-md shadow-2xl border border-white/10 relative z-10 m-4">
-        
+
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-4 border border-primary/20">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
           </div>
           <h2 className="text-3xl font-bold text-white tracking-tight">Create New Password</h2>
           <p className="text-gray-400 text-sm mt-2">Secure your account by choosing a strong password.</p>
