@@ -5,10 +5,12 @@ import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
 import FaceAuthModal from "../components/FaceAuthModal";
+import { useToast } from "../context/ToastContext";
 
 function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -90,7 +92,7 @@ function Settings() {
     if (loginError) {
       setMfaLoading(false);
       setEmailError("emailPassword");
-      return alert("Current password is incorrect");
+      return showToast("Current password is incorrect");
     }
 
     if (mfaEnabled && mfaUnenrollFactorId) {
@@ -103,11 +105,13 @@ function Settings() {
     const { error } = await supabase.auth.updateUser({ email });
     setMfaLoading(false);
 
-    if (error) alert(error.message);
+    if (error) showToast(error.message);
     else {
-      alert("Email updated! Please login again.");
-      await signOut();
-      window.location.href = "/login";
+      showToast("Email updated! Please login again.", "success");
+      setTimeout(async () => {
+        await signOut();
+        window.location.href = "/login";
+      }, 2000);
     }
   };
 
@@ -125,7 +129,7 @@ function Settings() {
     if (loginError) {
       setMfaLoading(false);
       setPasswordError("currentPassword");
-      return alert("Current password is incorrect");
+      return showToast("Current password is incorrect");
     }
 
     if (mfaEnabled && mfaUnenrollFactorId) {
@@ -140,11 +144,13 @@ function Settings() {
     });
     setMfaLoading(false);
 
-    if (error) alert(error.message);
+    if (error) showToast(error.message);
     else {
-      alert("Password updated! Please login again.");
-      await signOut();
-      window.location.href = "/login";
+      showToast("Password updated! Please login again.", "success");
+      setTimeout(async () => {
+        await signOut();
+        window.location.href = "/login";
+      }, 2000);
     }
   };
 
@@ -159,7 +165,7 @@ function Settings() {
 
     if (loginError) {
       setFaceIdLoading(false);
-      return alert("Incorrect password. Face ID cannot be disabled.");
+      return showToast("Incorrect password. Face ID cannot be disabled.");
     }
 
     const { error } = await supabase
@@ -169,12 +175,12 @@ function Settings() {
 
     setFaceIdLoading(false);
     if (error) {
-      alert("Error removing Face ID: " + error.message);
+      showToast("Error removing Face ID: " + error.message);
     } else {
       setFaceIdEnabled(false);
       setShowFaceDisableConfirm(false);
       setFaceDisablePassword("");
-      alert("Face ID has been successfully removed.");
+      showToast("Face ID has been successfully removed.", "success");
     }
   };
 
@@ -186,8 +192,9 @@ function Settings() {
       });
       setMfaLoading(false);
       if (error) {
-        alert("Error re-enabling 2FA: " + error.message);
+        showToast("Error re-enabling 2FA: " + error.message);
       } else {
+        showToast("Two-Factor Authentication re-enabled.", "success");
         setMfaEnabled(true);
       }
       return;
@@ -218,7 +225,7 @@ function Settings() {
     if (loginError) {
       setMfaLoading(false);
       setMfaPasswordError("mfaPassword");
-      return alert("Current password is incorrect");
+      return showToast("Current password is incorrect");
     }
 
     const { data, error } = await supabase.auth.mfa.enroll({
@@ -227,7 +234,7 @@ function Settings() {
 
     setMfaLoading(false);
     if (error) {
-      return alert("Error setting up MFA: " + error.message);
+      return showToast("Error setting up MFA: " + error.message);
     }
 
     setMfaQrCode(data.totp.qr_code);
@@ -285,11 +292,11 @@ function Settings() {
       if (stepUpAction === "email") {
         const { error } = await supabase.auth.updateUser({ email });
         if (error) throw error;
-        alert("Email updated! Please login again.");
+        showToast("Email updated! Redirecting...", "success");
       } else if (stepUpAction === "password") {
         const { error } = await supabase.auth.updateUser({ password: newPassword });
         if (error) throw error;
-        alert("Password updated! Please login again.");
+        showToast("Password updated! Redirecting...", "success");
       } else if (stepUpAction === "account deletion") {
         const res = await fetch("http://localhost:8000/user/delete-account/", {
           method: "DELETE",
@@ -297,9 +304,11 @@ function Settings() {
           body: JSON.stringify({ user_id: user.id }),
         });
         const data = await res.json();
-        alert(data.message);
-        await signOut();
-        window.location.href = "/";
+        showToast(data.message, "success");
+        setTimeout(async () => {
+          await signOut();
+          window.location.href = "/";
+        }, 2000);
         return;
       }
 
@@ -307,7 +316,7 @@ function Settings() {
       window.location.href = "/login";
     } catch (err) {
       setMfaVerifyError("Invalid code");
-      alert(err.message);
+      showToast(err.message);
     } finally {
       setMfaLoading(false);
     }
@@ -335,8 +344,9 @@ function Settings() {
 
     setMfaLoading(false);
     if (error) {
-      alert("Error disabling 2FA: " + error.message);
+      showToast("Error disabling 2FA: " + error.message);
     } else {
+      showToast("Two-Factor Authentication disabled.", "success");
       setMfaEnabled(false);
       cancelMfaSetup();
     }
@@ -344,10 +354,10 @@ function Settings() {
 
   const deleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") {
-      return alert("You must type DELETE to confirm.");
+      return showToast("You must type DELETE to confirm.");
     }
     if (!deletePassword) {
-      return alert("Please enter your current password to confirm deletion.");
+      return showToast("Please enter your current password to confirm deletion.");
     }
 
     setMfaLoading(true);
@@ -359,7 +369,7 @@ function Settings() {
 
     if (loginError) {
       setMfaLoading(false);
-      return alert("Current password is incorrect.");
+      return showToast("Current password is incorrect.");
     }
 
     if (mfaEnabled && mfaUnenrollFactorId) {
@@ -377,12 +387,14 @@ function Settings() {
       });
 
       const data = await res.json();
-      alert(data.message);
+      showToast(data.message, "success");
 
-      await signOut();
-      window.location.href = "/";
+      setTimeout(async () => {
+        await signOut();
+        window.location.href = "/";
+      }, 2000);
     } catch {
-      alert("Error deleting account");
+      showToast("Error deleting account");
     } finally {
       setMfaLoading(false);
     }
@@ -837,7 +849,7 @@ function Settings() {
         onSuccess={() => {
           setFaceIdEnabled(true);
           setIsFaceModalOpen(false);
-          alert("Face ID enabled successfully!");
+          showToast("Face ID enabled successfully!", "success");
         }}
       />
     </div>

@@ -8,6 +8,7 @@ import {
   signOut,
 } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,7 @@ function Signup() {
   const [errorField, setErrorField] = useState("");
 
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const handleSignup = async () => {
     if (!email) return setErrorField("email");
@@ -25,20 +27,24 @@ function Signup() {
 
     if (password !== confirmPassword) {
       setErrorField("confirmPassword");
-      return alert("Passwords do not match");
+      return showToast("Passwords do not match");
     }
     setErrorField("");
 
     const { error } = await signUp(email, password);
 
     if (error) {
-      if (error.message.toLowerCase().includes("email")) setErrorField("email");
-      else if (error.message.toLowerCase().includes("password")) setErrorField("password");
-      else setErrorField("both");
-      alert(error.message);
+      if (error.message.toLowerCase().includes("email")) {
+        setErrorField("email");
+      } else if (error.message.toLowerCase().includes("password")) {
+        setErrorField("password");
+      } else {
+        setErrorField("both");
+      }
+      showToast(error.message);
     } else {
       await signOut();
-      alert("Account created! Please login.");
+      showToast("Account created! Please login.", "success");
       navigate("/login");
     }
   };

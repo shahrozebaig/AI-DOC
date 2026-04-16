@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
+import { useToast } from "../context/ToastContext";
 
 function ResetPassword() {
+  const { showToast } = useToast();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,11 +33,11 @@ function ResetPassword() {
 
   const handleReset = async () => {
     if (!password || !confirmPassword) {
-      return alert("Please fill in all password fields.");
+      return showToast("Please fill in all password fields.");
     }
 
     if (password !== confirmPassword) {
-      return alert("Passwords do not match.");
+      return showToast("Passwords do not match.");
     }
 
     if (mfaEnabled && !mfaCode) {
@@ -64,14 +66,16 @@ function ResetPassword() {
 
       if (error) throw error;
 
-      alert("Password updated successfully! Please login with your new credentials.");
-      await signOut();
-      window.location.href = "/login";
+      showToast("Password updated successfully! Redirecting...", "success");
+      setTimeout(async () => {
+        await signOut();
+        window.location.href = "/login";
+      }, 2000);
     } catch (err) {
       if (err.message.includes("MFA")) {
         setMfaError("Invalid or expired MFA code.");
       } else {
-        alert(err.message);
+        showToast(err.message);
       }
     } finally {
       setLoading(false);

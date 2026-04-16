@@ -4,7 +4,7 @@ import numpy as np
 import base64
 import os
 import cv2
-import face_recognition # Standard import now that it's verified
+import face_recognition 
 from app.db.supabase_client import supabase
 
 router = APIRouter()
@@ -12,11 +12,11 @@ router = APIRouter()
 class FaceRegisterRequest(BaseModel):
     user_id: str
     email: str
-    image: str  # Base64 encoded image
+    image: str
 
 class FaceLoginRequest(BaseModel):
     email: str
-    image: str  # Base64 encoded image
+    image: str 
 
 def decode_image(base64_string):
     try:
@@ -68,7 +68,7 @@ async def login_face(req: FaceLoginRequest):
         response = supabase.table("face_auth").select("face_encoding", "user_id").eq("email", req.email).execute()
         
         if not response.data or len(response.data) == 0:
-            raise HTTPException(status_code=404, detail="Face ID not set up for this account. Please log in with password and set it up in Settings.")
+            raise HTTPException(status_code=404, detail="Face ID has not been set up for this account yet.")
         
         stored_encoding = np.array(response.data[0]["face_encoding"])
         
