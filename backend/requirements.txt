@@ -10,8 +10,8 @@ supabase
 torch
 transformers
 sentence-transformers
-numpy
+numpy==1.26.4
 tabulate
 dlib-bin
 face-recognition
-opencv-python-headless
+opencv-python-headless<4.10.0.0
