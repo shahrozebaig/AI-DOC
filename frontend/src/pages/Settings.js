@@ -107,11 +107,11 @@ function Settings() {
 
     if (error) showToast(error.message);
     else {
-      showToast("Email updated! Please login again.", "success");
+      showToast("If you recently changed your email, please check your inbox for the verification link.", "success");
       setTimeout(async () => {
         await signOut();
         window.location.href = "/login";
-      }, 2000);
+      }, 3000);
     }
   };
 
@@ -292,7 +292,7 @@ function Settings() {
       if (stepUpAction === "email") {
         const { error } = await supabase.auth.updateUser({ email });
         if (error) throw error;
-        showToast("Email updated! Redirecting...", "success");
+        showToast("If you recently changed your email, please check your inbox for the verification link.", "success");
       } else if (stepUpAction === "password") {
         const { error } = await supabase.auth.updateUser({ password: newPassword });
         if (error) throw error;

@@ -78,7 +78,7 @@ function Login() {
       if (msg.toLowerCase().includes("confirmed") || msg.toLowerCase().includes("verify")) {
         msg = "Email not verified. Please check your inbox for the confirmation link.";
       } else if (msg === "Invalid login credentials") {
-        msg = "If you recently changed your email, please check your inbox for the verification link.";
+        msg = "Invalid Credentials. Please try again.";
       }
       
       if (error.message.toLowerCase().includes("email") || error.message.toLowerCase().includes("user")) setErrorField("email");
