@@ -8,9 +8,15 @@ DocuMind AI is an advanced document-based conversational platform that enables u
 
 ---
 
-## 🎥 Project Walkthrough (Loom video)
+## 🎥 Demo
 
-Here is a full walkthrough of the project demonstrating features, workflow.
+https://github.com/user-attachments/assets/b2df5338-e514-42ab-870c-91419b50320d
+
+---
+
+## 🎥 Full Project Walkthrough (Loom)
+
+Here is a full explanation of the project demonstrating features and workflow.
 
 <p align="center">
   <a href="https://www.loom.com/share/1a8af684822a43e9b4b2518c406addc6">
