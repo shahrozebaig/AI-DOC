@@ -76,9 +76,7 @@ function FileUpload() {
           </div>
         ) : (
           <div className="flex flex-col items-center text-center space-y-2">
-            <svg className={`w-12 h-12 mb-2 transition-colors duration-300 ${isDragOver ? "text-primary" : "text-gray-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
+            <span className={`text-4xl mb-4 transition-transform duration-300 ${isDragOver ? "scale-125" : ""}`}>📤</span>
             <p className="text-foreground text-lg">
               <span className="font-semibold text-primary">Click to upload</span> or drag and drop
             </p>
@@ -91,7 +89,7 @@ function FileUpload() {
       <div className="text-sm">
         {fileName ? (
           <p className="text-primary flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>
+            <span className="text-lg">✅</span>
             Ready: {fileName}
           </p>
         ) : (

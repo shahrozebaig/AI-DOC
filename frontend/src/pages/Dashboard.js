@@ -49,19 +49,7 @@ function Dashboard() {
               onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ transform: collapsed ? "rotate(180deg)" : "none", transition: "transform 0.3s ease" }}
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
+              <span style={{ fontSize: "14px", transform: collapsed ? "rotate(180deg)" : "none", transition: "transform 0.3s ease" }}>⬅️</span>
               {!collapsed && <span>Collapse</span>}
             </button>
 
@@ -107,11 +95,7 @@ function Dashboard() {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
+                  <span style={{ fontSize: "16px" }}>📂</span>
                   <h3 style={{ fontSize: "12px", fontWeight: 600, color: "#d1d5db", margin: 0, letterSpacing: "0.04em", textTransform: "uppercase" }}>
                     Upload File
                   </h3>
@@ -176,16 +160,15 @@ function Dashboard() {
                     width: "36px",
                     height: "36px",
                     borderRadius: "10px",
-                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                    background: "rgba(255,255,255,0.05)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
+                    fontSize: "20px"
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
+                  🤖
                 </div>
                 <div>
                   <h2 style={{ fontSize: "15px", fontWeight: 600, margin: 0, color: "white" }}>AI Assistant</h2>

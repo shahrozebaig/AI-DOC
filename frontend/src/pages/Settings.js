@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
 import FaceAuthModal from "../components/FaceAuthModal";
 import { useToast } from "../context/ToastContext";
+import { ScanFace, Mail } from "lucide-react";
 
 function Settings() {
   const { user } = useContext(AuthContext);
@@ -417,7 +418,7 @@ function Settings() {
               className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
               title="Go back"
             >
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              <span className="text-lg">🔙</span>
             </button>
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Settings</h2>
           </div>
@@ -426,7 +427,7 @@ function Settings() {
             onClick={async () => { await signOut(); window.location.href = "/login"; }}
             className="flex items-center gap-2 bg-red-500/10 text-red-500 uppercase tracking-wider text-xs font-bold px-4 py-2.5 rounded-xl border border-red-500/30 hover:bg-red-500 hover:text-white transition-all shadow-[0_0_20px_rgba(239,68,68,0.15)] hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            <span>🚪</span>
             Log Out
           </button>
         </div>
@@ -437,7 +438,7 @@ function Settings() {
           <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all hover:bg-white/[0.07] flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <Mail size={20} />
               </div>
               <h3 className="text-lg font-semibold">Email Preferences</h3>
             </div>
@@ -490,8 +491,8 @@ function Settings() {
           {/* 🔐 PASSWORD SECTION */}
           <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all hover:bg-white/[0.07] flex flex-col">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" /></svg>
+              <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400 text-xl">
+                🔐
               </div>
               <h3 className="text-lg font-semibold">Security Settings</h3>
             </div>
@@ -533,7 +534,7 @@ function Settings() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <ScanFace size={20} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Face ID Authentication</h3>
@@ -558,7 +559,7 @@ function Settings() {
                   onClick={() => setIsFaceModalOpen(true)}
                   className="w-full bg-emerald-600/90 text-white font-semibold py-4 rounded-xl hover:bg-emerald-500 transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                  <ScanFace size={22} className="shrink-0" />
                   Set Up Face Login
                 </button>
               ) : showFaceDisableConfirm ? (
@@ -605,8 +606,8 @@ function Settings() {
           <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                <div className="p-2 bg-purple-500/20 rounded-lg text-xl">
+                  🛡️
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Two-Factor Authentication (2FA)</h3>
@@ -724,8 +725,8 @@ function Settings() {
           {/* 🔥 DANGER ZONE */}
           <div className="lg:col-span-2 bg-red-500/5 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-red-500/20 shadow-xl">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-red-500/20 rounded-lg text-red-500">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <div className="p-2 bg-red-500/20 rounded-lg text-xl">
+                ⚠️
               </div>
               <h3 className="text-lg font-semibold text-red-500">Danger Zone</h3>
             </div>

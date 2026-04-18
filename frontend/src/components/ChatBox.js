@@ -124,9 +124,7 @@ function ChatBox() {
           }`}
           title="Voice Command"
         >
-          <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
+          <span className="text-xl">🎙️</span>
         </button>
 
         <textarea
@@ -149,9 +147,7 @@ function ChatBox() {
           className="p-4 mb-[2px] text-primary hover:text-green-600 disabled:opacity-40 transition-colors flex-shrink-0"
           title="Send message"
         >
-          <svg className="w-7 h-7 transform rotate-45 -mt-1 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
+          <span className="text-2xl">⬆️</span>
         </button>
       </div>
 
