@@ -29,11 +29,12 @@ function Navbar() {
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4">
 
       {/* LEFT */}
-      <Link to="/" className="text-2xl font-bold text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.8)] tracking-tight flex items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-        </svg>
-        DocuMind
+      <Link to="/" className="flex items-center">
+        <img 
+          src="/Logo.jpeg" 
+          alt="DocuMind AI Logo" 
+          className="h-10 w-auto rounded-lg object-contain border border-white/5 shadow-md hover:scale-105 transition-transform"
+        />
       </Link>
 
       {/* CENTER (LANDING ONLY) */}

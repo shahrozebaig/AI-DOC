@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import AuthLayout from "../components/AuthLayout";
 import AuthBackground from "../components/AuthBackground";
+import { ScanFace } from "lucide-react";
 import {
   signIn,
   signInWithGoogle,
@@ -264,7 +265,7 @@ function Login() {
                     }}
                     className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-[0.98]"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <ScanFace size={22} className="shrink-0" />
                     Sign in with Face ID
                   </button>
                 </div>
