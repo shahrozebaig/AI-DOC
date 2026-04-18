@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { uploadFile } from "../services/chat";
+import { useToast } from "../context/ToastContext";
 
 function FileUpload() {
+  const { showToast } = useToast();
   const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -14,9 +16,9 @@ function FileUpload() {
 
     try {
       await uploadFile(file);
-      alert("File uploaded successfully!");
+      showToast("File uploaded successfully!", "success");
     } catch (err) {
-      alert("Upload failed");
+      showToast("Upload failed. Please try again.", "error");
       setFileName("");
     }
 
