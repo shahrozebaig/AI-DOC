@@ -5,9 +5,11 @@ export const sendMessage = async (message) => {
   return res.data;
 };
 
-export const uploadFile = async (file) => {
+export const uploadFiles = async (files) => {
   const formData = new FormData();
-  formData.append("file", file);
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
 
   const res = await API.post("/upload/", formData);
   return res.data;
