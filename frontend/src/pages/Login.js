@@ -137,7 +137,7 @@ function Login() {
             <img 
               src="/Login.jpeg" 
               alt="Login Visual" 
-              className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-[20s] ease-linear"
+              className="absolute inset-0 w-full h-full object-cover object-left transform group-hover:scale-110 transition-transform duration-[20s] ease-linear"
             />
             {/* Subtle Overlay to blend with the rest of the dark theme */}
             <div className="absolute inset-0 bg-black/20 z-[1]" />
