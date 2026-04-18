@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/Doc.png" alt="Banner" width="55%">
+  <img src="frontend/public/Logo.jpeg" alt="Banner" width="55%">
 </p>
 
 ## Overview
@@ -26,72 +26,15 @@ Here is a full explanation of the project demonstrating features and workflow.
 
 ---
 
-## Key Features
-
-### Document Intelligence
-
-* Upload and process large PDF documents efficiently  
-* Handles large-scale documents with optimized chunking  
-* Context-aware question answering using RAG architecture  
-* High-relevance retrieval with improved semantic search  
-
-### Interactive Chat System
-
-* Real-time conversational interface  
-* Accurate responses grounded in document context  
-* Enhanced retrieval using optimized similarity search  
-
-### File Handling
-
-* Drag-and-drop file upload support  
-* Seamless document ingestion pipeline  
-* Automatic indexing and processing  
-
 ---
 
-## Security Features
+## 🛠️ System Architecture & Workflow
 
-DocuMind AI is built with strong user security and account management capabilities:
+Below is the visual overview of how **DocuMind AI** processes documents, manages retrieval, and generates intelligent responses through its RAG pipeline.
 
-* Two-Factor Authentication (2FA) using 6-digit OTP (Authenticator-based)  
-* Email-based password reset (Forgot Password)  
-* Secure account deletion via backend API  
-* Protected routes for authenticated users only  
-* Session-based authentication using Supabase  
-* OAuth login support (Google and GitHub)  
-
----
-
-## How to Use
-
-1. **Create an Account / Login**  
-   Sign up using email or log in via Google/GitHub authentication.  
-
-2. **Upload Document**  
-   Upload a PDF file using file selection or drag-and-drop.  
-
-3. **Ask Questions**  
-   Enter queries related to the uploaded document.  
-
-4. **Receive Responses**  
-   The system retrieves relevant content and generates accurate answers.  
-
-5. **Enhanced Security (Optional)**  
-   Enable 2FA for additional account protection.  
-
-6. **Manage Account Settings**  
-   Update email, password, or delete account securely.  
-
----
-
-## Technical Architecture
-
-DocuMind AI follows a modular full-stack architecture:
-
-* Frontend handles UI/UX and user interaction  
-* Backend manages APIs, document processing, and business logic  
-* AI layer performs embedding, retrieval, and response generation  
-* Authentication and database services are managed via Supabase  
+<p align="center">
+  <img src="frontend/public/Rag.jpeg" alt="RAG Pipeline Overview" width="90%">
+</p>
 
 ---
 

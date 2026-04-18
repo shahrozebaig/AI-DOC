@@ -15,8 +15,8 @@ function Hero() {
       <div className="relative z-10 max-w-3xl px-6 pointer-events-none">
 
         {/* TITLE */}
-        <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold uppercase animate-fade-up">
-          DocuMind <span className="text-primary">AI</span>
+        <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold uppercase animate-fade-up animate-gradient-text">
+          DocuMind AI
         </h1>
 
         {/* 🔥 NEW TAGLINE */}
