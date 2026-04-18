@@ -57,35 +57,14 @@ function Signup() {
         <div className="flex w-full max-w-4xl bg-white/95 backdrop-blur-xl rounded-[24px] shadow-2xl overflow-hidden mx-4 min-h-[550px] border border-white/20">
           
           {/* LEFT: Branding */}
-          <div className="hidden md:flex w-2/5 flex-col justify-between p-10 bg-gradient-to-br from-black to-gray-900 relative">
-            <div className="relative z-10 flex flex-col space-y-6">
-              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight leading-tight">Start your <br/>journey.</h1>
-                <p className="text-gray-400 text-sm mt-3 leading-relaxed">
-                  Sign up today and experience the future of intelligent document analysis.
-                </p>
-              </div>
-            </div>
-
-            <div className="relative z-10 p-5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md mt-10">
-              <ul className="space-y-3 text-sm text-gray-300">
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</div>
-                  Semantic Document Search
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</div>
-                  AI Context Generation
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</div>
-                  Secure Cloud Workspace
-                </li>
-              </ul>
-            </div>
+          <div className="hidden md:flex w-2/5 relative overflow-hidden group">
+            <img 
+              src="/Signup.jpeg" 
+              alt="Signup Visual" 
+              className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-[20s] ease-linear"
+            />
+            {/* Subtle Overlay */}
+            <div className="absolute inset-0 bg-black/20 z-[1]" />
           </div>
 
           {/* RIGHT: Form */}
