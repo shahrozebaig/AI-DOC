@@ -1,136 +1,116 @@
 import { motion } from "framer-motion";
 
-const container = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.25,
-    },
+const steps = [
+  {
+    title: "Upload Document",
+    description: "Securely upload your massive PDF or document into your workspace in seconds. Our system processes high-volume data with lightning speed and precision.",
+    image: "/Upload.jpeg",
+    icon: "📤",
+    color: "from-purple-500 to-indigo-600",
+    glow: "rgba(168,85,247,0.4)"
   },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 50 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
+  {
+    title: "Ask Questions",
+    description: "Chat naturally with the AI like you're talking directly to a human expert. Get instant clarifications on complex topics within your documents.",
+    image: "/Ask.jpeg",
+    icon: "💬",
+    color: "from-blue-500 to-cyan-500",
+    glow: "rgba(59,130,246,0.4)"
   },
-};
+  {
+    title: "Get Smart Answers",
+    description: "The AI engine reads your context entirely and responds with precise insights instantly. Every answer is backed by references to your original content.",
+    image: "/Answer.jpeg",
+    icon: "✨",
+    color: "from-green-500 to-emerald-500",
+    glow: "rgba(34,197,94,0.4)"
+  }
+];
 
 function HowItWorks() {
   return (
-    <section
-      id="how"
-      className="py-28 px-6 text-center relative overflow-hidden"
-    >
+    <section id="how" className="py-24 px-6 relative overflow-hidden bg-[#0A0A0F]">
+      {/* Background Ambience */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
 
-      {/* 🌈 MOVING GRADIENT BACKGROUND */}
-      <div className="absolute inset-0 animate-gradient bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-green-500/10 blur-3xl opacity-40 pointer-events-none" />
-
-      {/* TITLE */}
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-4xl font-bold mb-20 relative z-10"
-      >
-        How It Works
-      </motion.h2>
-
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="flex flex-col md:flex-row items-center justify-center gap-10 max-w-6xl mx-auto relative z-10"
-      >
-
-        {/* STEP 1 */}
+      <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
-          variants={item}
-          whileHover={{ y: -10, scale: 1.05 }}
-          className="relative bg-white/5 backdrop-blur-xl p-8 pt-10 rounded-3xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full md:w-1/3 hover:border-purple-500/50 hover:shadow-[0_8px_30px_rgba(168,85,247,0.2)] transition-all duration-300 group"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-24"
         >
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 p-[1px] shadow-[0_0_20px_rgba(168,85,247,0.5)] group-hover:shadow-[0_0_30px_rgba(168,85,247,0.8)] transition-all">
-            <div className="w-full h-full bg-[#13111C] rounded-2xl flex items-center justify-center font-bold text-purple-400 text-xl">
-              1
-            </div>
-          </div>
-
-          <div className="w-12 h-12 mx-auto bg-purple-500/10 rounded-full flex items-center justify-center mb-4 border border-purple-500/20 text-purple-400">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-          </div>
-
-          <h3 className="font-bold text-xl text-white tracking-tight">
-            Upload Document
-          </h3>
-          <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-            Securely upload your massive PDF or document into your workspace in seconds.
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            How It <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Works</span>
+          </h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            Experience the power of Al-driven document analysis in three simple steps.
           </p>
         </motion.div>
 
-        {/* ✨ GLOW LINE */}
-        <div className="hidden md:block w-20 h-[2px] bg-gradient-to-r from-purple-500 via-blue-500 to-transparent opacity-50 shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+        <div className="space-y-32">
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, delay: index * 0.1 }}
+              className={`flex flex-col ${
+                index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+              } items-center gap-12 md:gap-24`}
+            >
+              {/* Image Side */}
+              <div className="w-full md:w-1/2">
+                <div className="relative group">
+                  <div 
+                    className={`absolute -inset-4 bg-gradient-to-r ${step.color} rounded-[2.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500`}
+                  />
+                  <div className="relative rounded-[2rem] overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
+                    <img 
+                      src={step.image} 
+                      alt={step.title}
+                      className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-transparent to-transparent opacity-60" />
+                  </div>
+                  
+                  {/* Decorative Elements */}
+                  <div className={`absolute -bottom-6 ${index % 2 === 0 ? "-right-6" : "-left-6"} w-24 h-24 bg-gradient-to-br ${step.color} rounded-full blur-3xl opacity-30 animate-pulse`} />
+                </div>
+              </div>
 
-        {/* STEP 2 */}
-        <motion.div
-          variants={item}
-          whileHover={{ y: -10, scale: 1.05 }}
-          className="relative bg-white/5 backdrop-blur-xl p-8 pt-10 rounded-3xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full md:w-1/3 hover:border-blue-500/50 hover:shadow-[0_8px_30px_rgba(59,130,246,0.2)] transition-all duration-300 group"
-        >
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-[1px] shadow-[0_0_20px_rgba(59,130,246,0.5)] group-hover:shadow-[0_0_30px_rgba(59,130,246,0.8)] transition-all">
-             <div className="w-full h-full bg-[#11141C] rounded-2xl flex items-center justify-center font-bold text-blue-400 text-xl">
-               2
-             </div>
-          </div>
+              {/* Text Side */}
+              <div className="w-full md:w-1/2 space-y-6">
+                <div className="inline-flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${step.color} p-[1px]`}>
+                    <div className="w-full h-full bg-[#0A0A0F] rounded-2xl flex items-center justify-center text-2xl">
+                      {step.icon}
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold tracking-widest uppercase text-gray-500">Step {index + 1}</span>
+                </div>
+                
+                <h3 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                  {step.title}
+                </h3>
+                
+                <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
+                  {step.description}
+                </p>
 
-          <div className="w-12 h-12 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center mb-4 border border-blue-500/20 text-blue-400">
-             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-          </div>
-
-          <h3 className="font-bold text-xl text-white tracking-tight">
-            Ask Questions
-          </h3>
-          <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-            Chat naturally with the AI like you're talking directly to a human expert.
-          </p>
-        </motion.div>
-
-        {/* ✨ GLOW LINE */}
-        <div className="hidden md:block w-20 h-[2px] bg-gradient-to-r from-blue-500 via-green-500 to-transparent opacity-50 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-
-        {/* STEP 3 */}
-        <motion.div
-          variants={item}
-          whileHover={{ y: -10, scale: 1.05 }}
-          className="relative bg-white/5 backdrop-blur-xl p-8 pt-10 rounded-3xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full md:w-1/3 hover:border-green-500/50 hover:shadow-[0_8px_30px_rgba(34,197,94,0.2)] transition-all duration-300 group"
-        >
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 p-[1px] shadow-[0_0_20px_rgba(34,197,94,0.5)] group-hover:shadow-[0_0_30px_rgba(34,197,94,0.8)] transition-all">
-             <div className="w-full h-full bg-[#111C15] rounded-2xl flex items-center justify-center font-bold text-green-400 text-xl">
-               3
-             </div>
-          </div>
-
-          <div className="w-12 h-12 mx-auto bg-green-500/10 rounded-full flex items-center justify-center mb-4 border border-green-500/20 text-green-400">
-             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-          </div>
-
-          <h3 className="font-bold text-xl text-white tracking-tight">
-            Get Smart Answers
-          </h3>
-          <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-            The AI engine reads your context entirely and responds with precise insights instantly.
-          </p>
-        </motion.div>
-
-      </motion.div>
-
-      {/* 🔥 EXTRA GLOW ORB */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-purple-500/20 blur-3xl opacity-30 pointer-events-none" />
-
+                <div className="pt-4">
+                  <div className={`h-1 w-20 bg-gradient-to-r ${step.color} rounded-full`} />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
 
-export default HowItWorks;
+export default HowItWorks;
