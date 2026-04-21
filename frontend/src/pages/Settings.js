@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { AuthContext } from "../context/AuthContext";
@@ -6,84 +6,85 @@ import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
 import FaceAuthModal from "../components/FaceAuthModal";
 import { useToast } from "../context/ToastContext";
-import { ScanFace, Mail } from "lucide-react";
+import { 
+  ScanFace, 
+  Lock, 
+  ShieldCheck, 
+  User, 
+  Trash2, 
+  ChevronRight,
+  LogOut,
+  ArrowLeft
+} from "lucide-react";
 
 function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  
+  // State management
+  const [activeTab, setActiveTab] = useState("profile");
   const [email, setEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaSetupStep, setMfaSetupStep] = useState("idle");
   const [mfaPassword, setMfaPassword] = useState("");
-  const [mfaPasswordError, setMfaPasswordError] = useState("");
   const [mfaQrCode, setMfaQrCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState("");
   const [mfaVerifyCode, setMfaVerifyCode] = useState("");
-  const [mfaVerifyError, setMfaVerifyError] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
-  const [mfaLoading, setMfaLoading] = useState(false);
   const [stepUpAction, setStepUpAction] = useState(null);
 
   // Face ID state
   const [faceIdEnabled, setFaceIdEnabled] = useState(false);
   const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
-  const [faceIdLoading, setFaceIdLoading] = useState(false);
   const [showFaceDisableConfirm, setShowFaceDisableConfirm] = useState(false);
   const [faceDisablePassword, setFaceDisablePassword] = useState("");
 
-  useEffect(() => {
-    const checkMFA = async () => {
-      if (!user) return;
-      const { data } = await supabase.auth.mfa.listFactors();
+  const checkMFA = useCallback(async () => {
+    if (!user) return;
+    try {
+        const { data } = await supabase.auth.mfa.listFactors();
 
-      let verifiedFactor = null;
-      if (data && Array.isArray(data.all)) {
-        verifiedFactor = data.all.find(f => f.status === 'verified' && f.factor_type === 'totp');
-      } else if (data && Array.isArray(data.totp)) {
-        verifiedFactor = data.totp.find(f => f.status === 'verified');
-      } else if (Array.isArray(data)) {
-        verifiedFactor = data.find(f => f.status === 'verified' && f.factor_type === 'totp');
-      }
-
-      if (verifiedFactor) {
-        setMfaUnenrollFactorId(verifiedFactor.id);
-        if (user.user_metadata?.is_mfa_enabled === false) {
-          setMfaEnabled(false);
-        } else {
-          setMfaEnabled(true);
+        let verifiedFactor = null;
+        if (data && Array.isArray(data.all)) {
+            verifiedFactor = data.all.find(f => f.status === 'verified' && f.factor_type === 'totp');
+        } else if (data && Array.isArray(data.totp)) {
+            verifiedFactor = data.totp.find(f => f.status === 'verified');
         }
-      } else {
-        setMfaEnabled(false);
-        setMfaUnenrollFactorId("");
-      }
 
-      // Check Face ID status
-      const { data: faceData } = await supabase
-        .from("face_auth")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      setFaceIdEnabled(!!faceData);
-    };
-    checkMFA();
+        if (verifiedFactor) {
+            setMfaUnenrollFactorId(verifiedFactor.id);
+            setMfaEnabled(user.user_metadata?.is_mfa_enabled !== false);
+        } else {
+            setMfaEnabled(false);
+            setMfaUnenrollFactorId("");
+        }
+
+        const { data: faceData } = await supabase
+            .from("face_auth")
+            .select("id")
+            .eq("user_id", user.id)
+            .maybeSingle();
+        
+        setFaceIdEnabled(!!faceData);
+    } catch (err) {
+        console.error("MFA check failed", err);
+    }
   }, [user]);
 
+  useEffect(() => {
+    checkMFA();
+  }, [checkMFA]);
+
   const updateEmail = async () => {
-    if (!email) return setEmailError("email");
-    if (!emailPassword) return setEmailError("emailPassword");
-    setEmailError("");
-    setMfaLoading(true);
+    if (!email || !emailPassword) return showToast("All fields are required");
 
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
@@ -91,24 +92,19 @@ function Settings() {
     });
 
     if (loginError) {
-      setMfaLoading(false);
-      setEmailError("emailPassword");
       return showToast("Current password is incorrect");
     }
 
     if (mfaEnabled && mfaUnenrollFactorId) {
       setStepUpAction("email");
       setMfaSetupStep("verifyStepUp");
-      setMfaLoading(false);
       return;
     }
 
     const { error } = await supabase.auth.updateUser({ email });
-    setMfaLoading(false);
-
-    if (error) showToast(error.message);
+    if (error) showToast(String(error.message));
     else {
-      showToast("If you recently changed your email, please check your inbox for the verification link.", "success");
+      showToast("Email update initiated! Check your inbox.", "success");
       setTimeout(async () => {
         await signOut();
         window.location.href = "/login";
@@ -117,10 +113,7 @@ function Settings() {
   };
 
   const updatePassword = async () => {
-    if (!currentPassword) return setPasswordError("currentPassword");
-    if (!newPassword) return setPasswordError("newPassword");
-    setPasswordError("");
-    setMfaLoading(true);
+    if (!currentPassword || !newPassword) return showToast("All fields are required");
 
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
@@ -128,26 +121,20 @@ function Settings() {
     });
 
     if (loginError) {
-      setMfaLoading(false);
-      setPasswordError("currentPassword");
       return showToast("Current password is incorrect");
     }
 
     if (mfaEnabled && mfaUnenrollFactorId) {
       setStepUpAction("password");
       setMfaSetupStep("verifyStepUp");
-      setMfaLoading(false);
       return;
     }
 
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-    setMfaLoading(false);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
 
-    if (error) showToast(error.message);
+    if (error) showToast(String(error.message));
     else {
-      showToast("Password updated! Please login again.", "success");
+      showToast("Password updated successfully!", "success");
       setTimeout(async () => {
         await signOut();
         window.location.href = "/login";
@@ -157,7 +144,6 @@ function Settings() {
 
   const disableFaceId = async () => {
     if (!faceDisablePassword) return;
-    setFaceIdLoading(true);
 
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
@@ -165,8 +151,7 @@ function Settings() {
     });
 
     if (loginError) {
-      setFaceIdLoading(false);
-      return showToast("Incorrect password. Face ID cannot be disabled.");
+      return showToast("Incorrect password.");
     }
 
     const { error } = await supabase
@@ -174,49 +159,18 @@ function Settings() {
       .delete()
       .eq("user_id", user.id);
 
-    setFaceIdLoading(false);
     if (error) {
-      showToast("Error removing Face ID: " + error.message);
+      showToast(String(error.message));
     } else {
       setFaceIdEnabled(false);
       setShowFaceDisableConfirm(false);
       setFaceDisablePassword("");
-      showToast("Face ID has been successfully removed.", "success");
+      showToast("Face ID removed.", "success");
     }
-  };
-
-  const handleEnableMfaClick = async () => {
-    if (mfaUnenrollFactorId) {
-      setMfaLoading(true);
-      const { error } = await supabase.auth.updateUser({
-        data: { is_mfa_enabled: true }
-      });
-      setMfaLoading(false);
-      if (error) {
-        showToast("Error re-enabling 2FA: " + error.message);
-      } else {
-        showToast("Two-Factor Authentication re-enabled.", "success");
-        setMfaEnabled(true);
-      }
-      return;
-    }
-    setMfaSetupStep("askPassword");
-  };
-
-  const cancelMfaSetup = () => {
-    setMfaSetupStep("idle");
-    setMfaPassword("");
-    setMfaPasswordError("");
-    setMfaQrCode("");
-    setMfaFactorId("");
-    setMfaVerifyCode("");
-    setMfaVerifyError("");
   };
 
   const startMfaSetup = async () => {
-    if (!mfaPassword) return setMfaPasswordError("mfaPassword");
-    setMfaPasswordError("");
-    setMfaLoading(true);
+    if (!mfaPassword) return showToast("Password is required");
 
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email: user.email,
@@ -224,19 +178,11 @@ function Settings() {
     });
 
     if (loginError) {
-      setMfaLoading(false);
-      setMfaPasswordError("mfaPassword");
       return showToast("Current password is incorrect");
     }
 
-    const { data, error } = await supabase.auth.mfa.enroll({
-      factorType: 'totp',
-    });
-
-    setMfaLoading(false);
-    if (error) {
-      return showToast("Error setting up MFA: " + error.message);
-    }
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
+    if (error) return showToast(String(error.message));
 
     setMfaQrCode(data.totp.qr_code);
     setMfaFactorId(data.id);
@@ -244,9 +190,7 @@ function Settings() {
   };
 
   const confirmMfaSetup = async () => {
-    if (!mfaVerifyCode) return setMfaVerifyError("Required");
-    setMfaVerifyError("");
-    setMfaLoading(true);
+    if (!mfaVerifyCode) return showToast("Verification code is required");
 
     try {
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
@@ -259,25 +203,88 @@ function Settings() {
       });
 
       if (verifyError) throw verifyError;
-      await supabase.auth.updateUser({
-        data: { is_mfa_enabled: true }
-      });
+      await supabase.auth.updateUser({ data: { is_mfa_enabled: true } });
 
       setMfaEnabled(true);
       setMfaUnenrollFactorId(mfaFactorId);
-      cancelMfaSetup();
+      setMfaSetupStep("idle");
+      showToast("2FA Enabled", "success");
     } catch (err) {
-      setMfaVerifyError("Invalid code");
-      alert(err.message);
-    } finally {
-      setMfaLoading(false);
+      showToast("Invalid code");
+    }
+  };
+
+  const disableMfa = async () => {
+    if (!mfaPassword) return showToast("Password is required");
+
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: mfaPassword,
+    });
+
+    if (loginError) {
+      return showToast("Current password is incorrect");
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      data: { is_mfa_enabled: false }
+    });
+
+    if (error) {
+      showToast(String(error.message));
+    } else {
+      showToast("Two-Factor Authentication disabled", "success");
+      setMfaEnabled(false);
+      setMfaSetupStep("idle");
+      setMfaPassword("");
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (deleteConfirmText !== "DELETE") return showToast("Type DELETE to confirm");
+    if (!deletePassword) return showToast("Enter password");
+
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: deletePassword,
+    });
+
+    if (loginError) {
+        return showToast("Incorrect password");
+    }
+
+    if (mfaEnabled && mfaUnenrollFactorId) {
+        setStepUpAction("account deletion");
+        setMfaSetupStep("verifyStepUp");
+        return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/user/delete-account/", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id }),
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        showToast(data.message || "Account deleted", "success");
+        setTimeout(async () => {
+          await signOut();
+          window.location.href = "/";
+        }, 2000);
+      } else {
+          // Handle structured error or string detail
+          const errorMsg = typeof data.detail === 'string' ? data.detail : "Error deleting account";
+          showToast(errorMsg);
+      }
+    } catch {
+      showToast("Error deleting account");
     }
   };
 
   const confirmStepUp = async () => {
-    if (!mfaVerifyCode) return setMfaVerifyError("Required");
-    setMfaVerifyError("");
-    setMfaLoading(true);
+    if (!mfaVerifyCode) return showToast("Verification code is required");
 
     try {
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaUnenrollFactorId });
@@ -290,569 +297,461 @@ function Settings() {
       });
 
       if (verifyError) throw verifyError;
+      
       if (stepUpAction === "email") {
-        const { error } = await supabase.auth.updateUser({ email });
-        if (error) throw error;
-        showToast("If you recently changed your email, please check your inbox for the verification link.", "success");
+        await supabase.auth.updateUser({ email });
+        showToast("Check inbox for verification", "success");
       } else if (stepUpAction === "password") {
-        const { error } = await supabase.auth.updateUser({ password: newPassword });
-        if (error) throw error;
-        showToast("Password updated! Redirecting...", "success");
+        await supabase.auth.updateUser({ password: newPassword });
+        showToast("Password updated", "success");
       } else if (stepUpAction === "account deletion") {
-        const res = await fetch("http://localhost:8000/user/delete-account/", {
+         const res = await fetch("http://localhost:8000/user/delete-account/", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id: user.id }),
         });
         const data = await res.json();
-        showToast(data.message, "success");
-        setTimeout(async () => {
-          await signOut();
-          window.location.href = "/";
-        }, 2000);
-        return;
+        if (res.ok) {
+            showToast(data.message || "Account deleted", "success");
+            setTimeout(async () => {
+                await signOut();
+                window.location.href = "/";
+            }, 2000);
+            return;
+        } else {
+            throw new Error(typeof data.detail === 'string' ? data.detail : "Step-up failed");
+        }
       }
-
-      await signOut();
-      window.location.href = "/login";
-    } catch (err) {
-      setMfaVerifyError("Invalid code");
-      showToast(err.message);
-    } finally {
-      setMfaLoading(false);
-    }
-  };
-
-  const disableMfa = async () => {
-    if (!mfaPassword) return setMfaPasswordError("mfaPassword");
-    setMfaPasswordError("");
-    setMfaLoading(true);
-
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: mfaPassword,
-    });
-
-    if (loginError) {
-      setMfaLoading(false);
-      setMfaPasswordError("mfaPassword");
-      return alert("Current password is incorrect");
-    }
-
-    const { error } = await supabase.auth.updateUser({
-      data: { is_mfa_enabled: false }
-    });
-
-    setMfaLoading(false);
-    if (error) {
-      showToast("Error disabling 2FA: " + error.message);
-    } else {
-      showToast("Two-Factor Authentication disabled.", "success");
-      setMfaEnabled(false);
-      cancelMfaSetup();
-    }
-  };
-
-  const deleteAccount = async () => {
-    if (deleteConfirmText !== "DELETE") {
-      return showToast("You must type DELETE to confirm.");
-    }
-    if (!deletePassword) {
-      return showToast("Please enter your current password to confirm deletion.");
-    }
-
-    setMfaLoading(true);
-
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: deletePassword,
-    });
-
-    if (loginError) {
-      setMfaLoading(false);
-      return showToast("Current password is incorrect.");
-    }
-
-    if (mfaEnabled && mfaUnenrollFactorId) {
-      setStepUpAction("account deletion");
-      setMfaSetupStep("verifyStepUp");
-      setMfaLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:8000/user/delete-account/", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: user.id }),
-      });
-
-      const data = await res.json();
-      showToast(data.message, "success");
 
       setTimeout(async () => {
         await signOut();
-        window.location.href = "/";
+        window.location.href = "/login";
       }, 2000);
-    } catch {
-      showToast("Error deleting account");
-    } finally {
-      setMfaLoading(false);
+    } catch (err) {
+      showToast(err.message || "Invalid code");
     }
   };
 
+  const menuItems = [
+    { id: "profile", label: "Profile", icon: <User size={18} /> },
+    { id: "security", label: "Security", icon: <ShieldCheck size={18} /> },
+    { id: "account", label: "Account", icon: <Trash2 size={18} /> },
+  ];
+
   return (
-    <div className="min-h-screen bg-hero text-white pt-24 pb-12 relative overflow-hidden">
-
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 pointer-events-none" />
-
+    <div className="min-h-screen bg-[#080808] text-gray-200 font-sans mt-20">
       <Navbar />
 
-      <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 md:px-8 mt-8 relative z-10">
-
-        {/* HEADER SECTION */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
-              title="Go back"
+      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-12">
+        
+        {/* SIDEBAR NAVIGATION */}
+        <aside className="w-full md:w-64 shrink-0">
+          <div className="flex items-center gap-3 mb-10">
+            <button 
+                onClick={() => navigate("/dashboard")}
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors border border-white/10"
             >
-              <span className="text-lg">🔙</span>
+                <ArrowLeft size={16} />
             </button>
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Settings</h2>
+            <h1 className="text-xl font-bold text-white">Settings</h1>
           </div>
-
-          <button
-            onClick={async () => { await signOut(); window.location.href = "/login"; }}
-            className="flex items-center gap-2 bg-red-500/10 text-red-500 uppercase tracking-wider text-xs font-bold px-4 py-2.5 rounded-xl border border-red-500/30 hover:bg-red-500 hover:text-white transition-all shadow-[0_0_20px_rgba(239,68,68,0.15)] hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]"
-          >
-            <span>🚪</span>
-            Log Out
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-
-          {/* 📧 EMAIL SECTION */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all hover:bg-white/[0.07] flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                <Mail size={20} />
-              </div>
-              <h3 className="text-lg font-semibold">Email Preferences</h3>
-            </div>
-
-            <div className="mb-6 bg-black/40 p-4 rounded-xl border border-white/5 flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Email</p>
-                <p className="font-medium text-gray-200">{user?.email}</p>
-              </div>
-              <span className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] uppercase tracking-wider font-bold rounded-full border border-green-500/20">Verified</span>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1.5 ml-1">New Email <span className="text-red-500">*</span></label>
-                <input
-                  placeholder="Enter new email address"
-                  className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all ${emailError === "email" ? "border-red-500" : "border-white/10 focus:border-primary focus:bg-black/70"
-                    }`}
-                  onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
-                />
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm text-gray-400 mb-1.5 ml-1">Current Password <span className="text-red-500">*</span></label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Required to update email"
-                  className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all pr-12 ${emailError === "emailPassword" ? "border-red-500" : "border-white/10 focus:border-primary focus:bg-black/70"
-                    }`}
-                  onChange={(e) => { setEmailPassword(e.target.value); setEmailError(""); }}
-                />
-                <button
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 bottom-3.5 text-gray-500 hover:text-gray-300 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                </button>
-              </div>
-
+          
+          <nav className="flex flex-col gap-1">
+            {menuItems.map((item) => (
               <button
-                onClick={updateEmail}
-                className="w-full bg-primary text-black font-semibold py-3 rounded-xl hover:brightness-110 transition-all active:scale-[0.98]"
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  activeTab === item.id 
+                    ? "bg-white/10 text-white border border-white/10 shadow-lg" 
+                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
+                }`}
               >
-                Update Email Address
+                <div className="flex items-center gap-3">
+                    {item.icon}
+                    {item.label}
+                </div>
+                {activeTab === item.id && <ChevronRight size={14} className="opacity-50" />}
               </button>
-            </div>
+            ))}
+          </nav>
+
+          <div className="mt-12 pt-8 border-t border-white/5">
+            <button 
+                onClick={async () => { await signOut(); window.location.href = "/login"; }}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500/80 hover:text-red-400 hover:bg-red-500/5 rounded-xl transition-all"
+            >
+                <LogOut size={18} />
+                Sign Out
+            </button>
           </div>
+        </aside>
 
-          {/* 🔐 PASSWORD SECTION */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all hover:bg-white/[0.07] flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400 text-xl">
-                🔐
-              </div>
-              <h3 className="text-lg font-semibold">Security Settings</h3>
-            </div>
+        {/* MAIN CONTENT AREA */}
+        <main className="flex-1 animate-in fade-in slide-in-from-right-4 duration-500">
+          
+          {/* PROFILE TAB */}
+          {activeTab === "profile" && (
+            <div className="space-y-10">
+                <header>
+                    <h2 className="text-2xl font-bold text-white mb-2">Profile Settings</h2>
+                    <p className="text-sm text-gray-500">Manage your personal information and how others see you.</p>
+                </header>
 
-            <div className="space-y-4">
-              <div className="relative">
-                <label className="block text-sm text-gray-400 mb-1.5 ml-1">Current Password <span className="text-red-500">*</span></label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter current password"
-                  className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all pr-12 ${passwordError === "currentPassword" ? "border-red-500" : "border-white/10 focus:border-blue-500 focus:bg-black/70"
-                    }`}
-                  onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError(""); }}
-                />
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm text-gray-400 mb-1.5 ml-1">New Password <span className="text-red-500">*</span></label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter new password"
-                  className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all pr-12 ${passwordError === "newPassword" ? "border-red-500" : "border-white/10 focus:border-blue-500 focus:bg-black/70"
-                    }`}
-                  onChange={(e) => { setNewPassword(e.target.value); setPasswordError(""); }}
-                />
-              </div>
-
-              <button
-                onClick={updatePassword}
-                className="w-full bg-blue-600/90 text-white font-semibold py-3 rounded-xl hover:bg-blue-500 transition-all active:scale-[0.98]"
-              >
-                Change Password
-              </button>
-            </div>
-          </div>
-
-          {/* 🎭 FACE ID SECTION */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all hover:bg-white/[0.07] flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
-                  <ScanFace size={20} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Face ID Authentication</h3>
-                </div>
-              </div>
-              {faceIdEnabled ? (
-                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] uppercase tracking-wider font-bold rounded-full border border-emerald-500/20 flex items-center gap-1.5 animate-in fade-in transition-all">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div> Enabled
-                </span>
-              ) : (
-                <span className="px-3 py-1 bg-gray-500/10 text-gray-500 text-[10px] uppercase tracking-wider font-bold rounded-full border border-gray-500/20">Disabled</span>
-              )}
-            </div>
-
-            <p className="text-sm text-gray-400 mb-6 font-medium">
-              Enable biometric login using high-precision face recognition. This adds a futuristic and seamless way to access your vault.
-            </p>
-
-            <div className="mt-auto">
-              {!faceIdEnabled ? (
-                <button
-                  onClick={() => setIsFaceModalOpen(true)}
-                  className="w-full bg-emerald-600/90 text-white font-semibold py-4 rounded-xl hover:bg-emerald-500 transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                >
-                  <ScanFace size={22} className="shrink-0" />
-                  Set Up Face Login
-                </button>
-              ) : showFaceDisableConfirm ? (
-                <div className="space-y-4 animate-in slide-in-from-bottom-2 duration-300">
-                  <div className="relative">
-                    <input
-                      type="password"
-                      placeholder="Confirm password to disable"
-                      className="w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 border-white/10 focus:border-red-500 transition-all font-mono"
-                      value={faceDisablePassword}
-                      onChange={(e) => setFaceDisablePassword(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && disableFaceId()}
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={disableFaceId}
-                      disabled={faceIdLoading}
-                      className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-500 transition-all disabled:opacity-50"
-                    >
-                      {faceIdLoading ? "Verifying..." : "Disable Face ID"}
-                    </button>
-                    <button
-                      onClick={() => setShowFaceDisableConfirm(false)}
-                      className="flex-1 bg-white/5 text-gray-400 py-3 rounded-xl hover:bg-white/10 transition-colors border border-white/10"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowFaceDisableConfirm(true)}
-                  className="w-full bg-white/5 text-gray-400 font-semibold py-4 rounded-xl hover:bg-white/10 hover:text-red-400 border border-white/10 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                  Disable Face ID
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* 🔐 TWO-FACTOR AUTHENTICATION SECTION */}
-          <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl transition-all flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg text-xl">
-                  🛡️
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Two-Factor Authentication (2FA)</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">Protect your account with an extra layer of security.</p>
-                </div>
-              </div>
-
-              {mfaEnabled ? (
-                <span className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] uppercase tracking-wider font-bold rounded-full border border-green-500/20 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> Enabled</span>
-              ) : (
-                <span className="px-3 py-1 bg-gray-500/20 text-gray-400 text-[10px] uppercase tracking-wider font-bold rounded-full border border-gray-500/20">Disabled</span>
-              )}
-            </div>
-
-            <div className="bg-black/30 p-5 rounded-xl border border-white/5 mt-2">
-              {mfaEnabled ? (
-                mfaSetupStep === "askPasswordDisable" ? (
-                  <div className="space-y-4 max-w-sm">
-                    <p className="text-sm text-gray-300">Please verify your password to disable Two-Factor Authentication.</p>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Current password"
-                        className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all pr-12 ${mfaPasswordError === "mfaPassword" ? "border-red-500" : "border-white/10 focus:border-red-500 focus:bg-black/70"}`}
-                        onChange={(e) => { setMfaPassword(e.target.value); setMfaPasswordError(""); }}
-                        onKeyDown={(e) => e.key === 'Enter' && disableMfa()}
-                      />
-                      <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 bottom-3.5 text-gray-500 hover:text-gray-300 transition-colors">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      </button>
+                <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-8">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-8">
+                        <div>
+                            <h3 className="text-sm font-semibold text-white mb-1">Email Address</h3>
+                            <p className="text-sm text-gray-500">{user?.email}</p>
+                        </div>
+                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] uppercase font-bold tracking-wider rounded-full border border-emerald-500/20">Verified</span>
                     </div>
-                    <div className="flex gap-3 mt-4">
-                      <button onClick={disableMfa} disabled={mfaLoading} className="flex-1 bg-red-600/90 text-white py-2.5 rounded-lg font-medium hover:bg-red-500 transition-all text-sm disabled:opacity-50">
-                        {mfaLoading ? "Processing..." : "Verify & Disable"}
-                      </button>
-                      <button onClick={cancelMfaSetup} disabled={mfaLoading} className="flex-1 bg-white/5 text-gray-300 py-2.5 rounded-lg hover:bg-white/10 transition-colors border border-white/10 text-sm disabled:opacity-50">Cancel</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <p className="text-sm text-gray-300 flex-1">Your account is currently protected by 2FA. You will be required to enter an OTP from your authenticator app each time you sign in.</p>
-                    <button onClick={() => setMfaSetupStep('askPasswordDisable')} className="flex-shrink-0 px-5 py-2.5 bg-red-500/10 text-red-500 font-semibold rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/20 text-sm flex items-center justify-center gap-2">
-                      Disable 2FA
-                    </button>
-                  </div>
-                )
-              ) : mfaSetupStep === "idle" ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <p className="text-sm text-gray-300 flex-1">Set up 2FA using a mobile app like <strong className="text-white">Google Authenticator</strong> or <strong className="text-white">Authy</strong>.</p>
-                  <button onClick={handleEnableMfaClick} disabled={mfaLoading} className="flex-shrink-0 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg transition-colors shadow-[0_0_15px_rgba(147,51,234,0.3)] text-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
-                    {mfaLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : null}
-                    Enable 2FA
-                  </button>
-                </div>
-              ) : mfaSetupStep === "askPassword" ? (
-                <div className="space-y-4 max-w-sm">
-                  <p className="text-sm text-gray-300">Please verify your password to set up Two-Factor Authentication.</p>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Current password"
-                      className={`w-full p-3 bg-black/50 text-white placeholder-gray-500 rounded-xl outline-none border-2 transition-all pr-12 ${mfaPasswordError === "mfaPassword" ? "border-red-500" : "border-white/10 focus:border-purple-500 focus:bg-black/70"}`}
-                      onChange={(e) => { setMfaPassword(e.target.value); setMfaPasswordError(""); }}
-                      onKeyDown={(e) => e.key === 'Enter' && startMfaSetup()}
-                    />
-                    <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 bottom-3.5 text-gray-500 hover:text-gray-300 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    </button>
-                  </div>
-                  <div className="flex gap-3">
-                    <button onClick={startMfaSetup} className="flex-1 bg-purple-600 text-white py-2.5 rounded-lg font-medium hover:bg-purple-500 transition-all text-sm">Verify & Continue</button>
-                    <button onClick={cancelMfaSetup} className="flex-1 bg-white/5 text-gray-300 py-2.5 rounded-lg hover:bg-white/10 transition-colors border border-white/10 text-sm">Cancel</button>
-                  </div>
-                </div>
-              ) : mfaSetupStep === "showQR" ? (
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div className="bg-white p-3 rounded-xl shadow-lg border-4 border-white">
-                    <img src={mfaQrCode} alt="MFA QR Code" className="w-40 h-40" />
-                  </div>
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <h4 className="text-white font-medium mb-1">1. Scan the QR Code</h4>
-                      <p className="text-sm text-gray-400">Open your authenticator app (like Google Authenticator) and scan this QR code.</p>
-                    </div>
-                    <div>
-                      <h4 className="text-white font-medium mb-2">2. Enter the Verification Code</h4>
-                      <div className="flex gap-3">
-                        <input
-                          type="text"
-                          placeholder="6-digit code"
-                          maxLength={6}
-                          className={`w-full max-w-[160px] p-2.5 bg-black/50 text-white tracking-[0.2em] font-mono text-center rounded-lg outline-none border-2 transition-all ${mfaVerifyError ? "border-red-500" : "border-white/10 focus:border-purple-500 focus:bg-black/70"}`}
-                          onChange={(e) => { setMfaVerifyCode(e.target.value.replace(/[^0-9]/g, '')); setMfaVerifyError(""); }}
-                          value={mfaVerifyCode}
-                          onKeyDown={(e) => e.key === 'Enter' && confirmMfaSetup()}
-                        />
-                        <button onClick={confirmMfaSetup} disabled={mfaLoading} className="px-5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-500 transition-all text-sm whitespace-nowrap disabled:opacity-50 shadow-[0_0_15px_rgba(147,51,234,0.2)]">
-                          {mfaLoading ? "Verifying..." : "Verify"}
+
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">New Email</label>
+                                <input 
+                                    type="email" 
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                                    placeholder="Enter new email"
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
+                                <input 
+                                    type="password" 
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                                    placeholder="Confirm password"
+                                    onChange={(e) => setEmailPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <button 
+                            onClick={updateEmail}
+                            className="bg-white text-black text-sm font-bold px-6 py-3 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
+                        >
+                            Update Profile
                         </button>
-                      </div>
-                      {mfaVerifyError && <p className="text-red-400 text-xs mt-1.5">{mfaVerifyError}</p>}
                     </div>
-                    <div className="pt-2">
-                      <button onClick={cancelMfaSetup} disabled={mfaLoading} className="text-xs text-gray-500 hover:text-white transition-colors flex items-center gap-1.5 underline">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        Cancel Setup
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
+                </section>
             </div>
-          </div>
+          )}
 
-          {/* 🔥 DANGER ZONE */}
-          <div className="lg:col-span-2 bg-red-500/5 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-red-500/20 shadow-xl">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-red-500/20 rounded-lg text-xl">
-                ⚠️
-              </div>
-              <h3 className="text-lg font-semibold text-red-500">Danger Zone</h3>
+          {/* SECURITY TAB */}
+          {activeTab === "security" && (
+            <div className="space-y-10">
+                <header>
+                    <h2 className="text-2xl font-bold text-white mb-2">Security</h2>
+                    <p className="text-sm text-gray-500">Enhanced protection for your documents and account.</p>
+                </header>
+
+                <div className="grid grid-cols-1 gap-6">
+                    {/* Password Section */}
+                    <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <Lock size={20} className="text-white" />
+                            <h3 className="text-lg font-bold text-white">Change Password</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div className="space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
+                                <input 
+                                    type="password" 
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">New Password</label>
+                                <input 
+                                    type="password" 
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <button 
+                             onClick={updatePassword}
+                            className="bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-white/10 transition-all active:scale-95"
+                        >
+                            Update Password
+                        </button>
+                    </section>
+
+                    {/* Biometric Section */}
+                    <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <ScanFace size={22} className="text-emerald-500" />
+                                <div>
+                                    <h3 className="text-lg font-bold text-white">Face ID Authentication</h3>
+                                    <p className="text-xs text-gray-500">Secure biometric login with high precision.</p>
+                                </div>
+                            </div>
+                            {faceIdEnabled ? (
+                                <button 
+                                    onClick={() => setShowFaceDisableConfirm(true)}
+                                    className="px-4 py-2 bg-red-500/10 text-red-500 text-xs font-bold rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all"
+                                >
+                                    Disable
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => setIsFaceModalOpen(true)}
+                                    className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-xs font-bold rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all"
+                                >
+                                    Enable Face ID
+                                </button>
+                            )}
+                        </div>
+
+                        {showFaceDisableConfirm && (
+                            <div className="p-6 bg-black/40 rounded-2xl border border-red-500/20 mt-4 space-y-4 animate-in zoom-in-95 duration-200">
+                                <p className="text-xs text-red-400">Please enter your password to disable Face ID authentication.</p>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="password" 
+                                        className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:border-red-500"
+                                        placeholder="Enter password"
+                                        onChange={(e) => setFaceDisablePassword(e.target.value)}
+                                    />
+                                    <button 
+                                        onClick={disableFaceId}
+                                        className="px-4 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-500 transition-all"
+                                    >
+                                        Confirm
+                                    </button>
+                                    <button 
+                                        onClick={() => setShowFaceDisableConfirm(false)}
+                                        className="px-4 bg-white/5 text-gray-400 rounded-xl text-xs font-bold hover:bg-white/10 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </section>
+
+                    {/* 2FA Section */}
+                    <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                        <div className="flex items-center gap-3">
+                             <div className="text-blue-500"><ShieldCheck size={26} /></div>
+                             <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">Two-Factor Authentication</h3>
+                                <p className="text-xs text-gray-500">Protect your account with a secondary verification code.</p>
+                             </div>
+                             <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                                mfaEnabled 
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+                                : "bg-gray-500/10 text-gray-500 border-gray-500/20"
+                             }`}>
+                                {mfaEnabled ? "Active" : "Inactive"}
+                             </div>
+                        </div>
+
+                        {!mfaEnabled ? (
+                            mfaSetupStep === "idle" ? (
+                                <button 
+                                    onClick={() => setMfaSetupStep("askPassword")}
+                                    className="w-full sm:w-auto bg-blue-600 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+                                >
+                                    Enable 2FA Protection
+                                </button>
+                            ) : (
+                                <div className="p-6 bg-black/40 rounded-2xl border border-white/10 mt-4 max-w-md">
+                                    {mfaSetupStep === "askPassword" && (
+                                        <div className="space-y-4">
+                                            <p className="text-sm text-gray-400">Confirm your password to begin 2FA enrollment.</p>
+                                            <input 
+                                                type="password"
+                                                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none"
+                                                placeholder="Current password"
+                                                onChange={(e) => setMfaPassword(e.target.value)}
+                                            />
+                                            <div className="flex gap-3 pt-2">
+                                                <button onClick={startMfaSetup} className="flex-1 bg-white text-black py-2.5 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all">Continue</button>
+                                                <button onClick={() => setMfaSetupStep("idle")} className="flex-1 bg-white/5 text-gray-400 py-2.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-all border border-white/10">Cancel</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {mfaSetupStep === "showQR" && (
+                                        <div className="space-y-6">
+                                            <div className="bg-white p-4 rounded-2xl w-fit mx-auto shadow-2xl">
+                                                <img src={mfaQrCode} alt="QR" className="w-44 h-44" />
+                                            </div>
+                                            <div className="space-y-4">
+                                                <p className="text-center text-sm text-gray-400">Scan this QR code in your authenticator app and enter the code below.</p>
+                                                <div className="flex gap-2">
+                                                    <input 
+                                                        type="text"
+                                                        className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-center tracking-[0.5em] font-mono outline-none focus:border-emerald-500 placeholder-gray-700"
+                                                        placeholder="000000"
+                                                        maxLength={6}
+                                                        onChange={(e) => setMfaVerifyCode(e.target.value)}
+                                                    />
+                                                    <button onClick={confirmMfaSetup} className="px-6 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-500 transition-all">Verify</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        ) : (
+                             mfaSetupStep === "askPasswordDisable" ? (
+                                <div className="p-6 bg-black/40 rounded-2xl border border-red-500/20 mt-4 max-w-md space-y-4">
+                                    <p className="text-sm text-red-400">Confirm your password to disable 2FA protection.</p>
+                                    <input 
+                                        type="password"
+                                        className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none"
+                                        placeholder="Current password"
+                                        onChange={(e) => setMfaPassword(e.target.value)}
+                                    />
+                                    <div className="flex gap-3">
+                                        <button onClick={disableMfa} className="flex-1 bg-red-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-red-500 transition-all">Disable Now</button>
+                                        <button onClick={() => setMfaSetupStep("idle")} className="flex-1 bg-white/5 text-gray-400 py-2.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-all border border-white/10">Cancel</button>
+                                    </div>
+                                </div>
+                             ) : (
+                                <button 
+                                    onClick={() => setMfaSetupStep("askPasswordDisable")}
+                                    className="text-xs text-gray-500 hover:text-red-400 transition-colors uppercase font-bold tracking-widest border border-white/5 px-4 py-2 rounded-lg hover:bg-red-500/5"
+                                >
+                                    Disable Protection
+                                </button>
+                             )
+                        )}
+                    </section>
+                </div>
             </div>
+          )}
 
-            <p className="text-sm text-red-400/80 mb-6 ml-1">Once you delete your account, there is no going back. Please be certain.</p>
+          {/* ACCOUNT TAB */}
+          {activeTab === "account" && (
+            <div className="space-y-10">
+                <header>
+                    <h2 className="text-2xl font-bold text-white mb-2">Account</h2>
+                    <p className="text-sm text-gray-500">Manage your subscription and account permanence.</p>
+                </header>
 
-            {!showDeleteConfirm ? (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="bg-red-600/10 text-red-500 border border-red-500/50 px-6 py-3 rounded-xl hover:bg-red-600 hover:text-white transition-all w-full font-semibold"
-              >
-                Delete Account
-              </button>
-            ) : (
-              <div className="bg-red-950/40 border border-red-500/30 rounded-xl p-5 space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-red-300 text-sm mb-1.5 ml-1">
-                      Type <strong className="text-white bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">DELETE</strong> to confirm.
-                    </p>
-                    <input
-                      type="text"
-                      placeholder="Type DELETE"
-                      value={deleteConfirmText}
-                      onChange={(e) => setDeleteConfirmText(e.target.value)}
-                      className="w-full p-3 bg-black/60 text-white rounded-xl outline-none border-2 border-transparent focus:border-red-500 transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <p className="text-red-300 text-sm mb-1.5 ml-1">
-                      Current Password
-                    </p>
-                    <input
-                      type="password"
-                      placeholder="Enter password to confirm"
-                      value={deletePassword}
-                      onChange={(e) => setDeletePassword(e.target.value)}
-                      className="w-full p-3 bg-black/60 text-white rounded-xl outline-none border-2 border-transparent focus:border-red-500 transition-colors"
-                    />
-                  </div>
+                <div className="space-y-8">
+                    <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-white mb-2 italic text-red-500 uppercase tracking-widest">Danger Zone</h3>
+                            <p className="text-sm text-gray-500 mb-6 font-medium">Once you delete your account, all your data will be permanently wiped from our servers. There is no undo.</p>
+                            
+                            {!showDeleteConfirm ? (
+                                <button 
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                    className="bg-red-500/10 text-red-500 border border-red-500/20 px-6 py-3 rounded-xl text-sm font-bold hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5"
+                                >
+                                    Delete My Account
+                                </button>
+                            ) : (
+                                <div className="space-y-6 p-8 bg-red-950/20 border border-red-500/20 rounded-2xl animate-in fade-in duration-500">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-red-400/60 uppercase tracking-widest mb-2 block">To confirm, type <span className="text-white">DELETE</span></label>
+                                            <input 
+                                                className="w-full bg-black/60 border border-red-500/20 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none transition-all placeholder-red-900/40"
+                                                placeholder="Type DELETE"
+                                                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                            />
+                                        </div>
+                                         <div>
+                                            <label className="text-xs font-bold text-red-400/60 uppercase tracking-widest mb-2 block">Your Password</label>
+                                            <input 
+                                                type="password" 
+                                                className="w-full bg-black/60 border border-red-500/20 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none transition-all"
+                                                placeholder="Account password"
+                                                onChange={(e) => setDeletePassword(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <button 
+                                            onClick={deleteAccount}
+                                            className="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-500 transition-all active:scale-95"
+                                        >
+                                            Permanently Delete
+                                        </button>
+                                        <button 
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                            className="flex-1 bg-white/5 text-gray-400 font-bold py-3 rounded-xl hover:bg-white/10 transition-all border border-white/10"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </section>
                 </div>
+            </div>
+          )}
 
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={deleteAccount}
-                    disabled={deleteConfirmText !== "DELETE" || !deletePassword || mfaLoading}
-                    className={`flex-1 py-3 rounded-xl text-white font-medium transition-all ${deleteConfirmText === "DELETE" && deletePassword ? "bg-red-600 hover:bg-red-500 active:scale-[0.98]" : "bg-red-900/50 cursor-not-allowed opacity-50"
-                      }`}
-                  >
-                    {mfaLoading ? "Confirming..." : "Confirm Delete"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowDeleteConfirm(false);
-                      setDeleteConfirmText("");
-                    }}
-                    className="flex-1 bg-white/5 text-gray-300 py-3 rounded-xl hover:bg-white/10 hover:text-white transition-colors font-medium border border-white/10 active:scale-[0.98]"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-        </div>
+        </main>
       </div>
 
-      {/* 🔥 STEP-UP MFA MODAL */}
+      {/* MFA Step-up Modal */}
       {mfaSetupStep === "verifyStepUp" && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#111] border border-white/10 w-full max-w-md rounded-2xl p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mb-2">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-              </div>
-              <h3 className="text-xl font-bold text-white">Security Verification</h3>
-              <p className="text-sm text-gray-400">Please enter the 6-digit code from your authenticator app to authorize this {stepUpAction} change.</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-[#111111] w-full max-w-md rounded-3xl border border-white/10 p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                <header className="mb-8 text-center">
+                    <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-500">
+                        <ShieldCheck size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Two-Step Verification</h3>
+                    <p className="text-sm text-gray-500">Enter the code from your authenticator app to authorize this sensitive action.</p>
+                </header>
 
-              <div className="w-full pt-4">
-                <input
-                  autoFocus
-                  type="text"
-                  placeholder="000000"
-                  maxLength={6}
-                  className={`w-full p-4 bg-black text-white text-center tracking-[0.5em] font-mono text-2xl rounded-xl border-2 transition-all outline-none ${mfaVerifyError ? "border-red-500" : "border-white/10 focus:border-purple-500"}`}
-                  onChange={(e) => { setMfaVerifyCode(e.target.value.replace(/[^0-9]/g, '')); setMfaVerifyError(""); }}
-                  value={mfaVerifyCode}
-                  onKeyDown={(e) => e.key === 'Enter' && confirmStepUp()}
-                />
-                {mfaVerifyError && <p className="text-red-500 text-xs mt-2">{mfaVerifyError}</p>}
-              </div>
-
-              <div className="flex gap-3 w-full pt-6">
-                <button
-                  onClick={confirmStepUp}
-                  disabled={mfaLoading}
-                  className="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50"
-                >
-                  {mfaLoading ? "Verifying..." : "Confirm Change"}
-                </button>
-                <button
-                  onClick={() => { setMfaSetupStep("idle"); setStepUpAction(null); setMfaVerifyCode(""); }}
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-3 rounded-xl border border-white/10 transition-all"
-                >
-                  Cancel
-                </button>
-              </div>
+                <div className="space-y-6">
+                    <input 
+                        type="text"
+                        className="w-full bg-black/60 border border-white/10 rounded-2xl px-4 py-4 text-center text-3xl tracking-[0.4em] font-mono outline-none focus:border-blue-500"
+                        placeholder="000000"
+                        maxLength={6}
+                        onChange={(e) => setMfaVerifyCode(e.target.value)}
+                    />
+                    <div className="flex gap-3">
+                        <button onClick={confirmStepUp} className="flex-1 bg-white text-black py-4 rounded-2xl font-bold hover:bg-gray-200 transition-all active:scale-95">Authorize</button>
+                        <button onClick={() => setMfaSetupStep("idle")} className="flex-1 bg-white/5 text-gray-400 py-4 rounded-2xl font-bold hover:bg-white/10 transition-all border border-white/10">Cancel</button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
       )}
 
-      <FaceAuthModal
+      {/* Face ID Modal */}
+      <FaceAuthModal 
         isOpen={isFaceModalOpen}
         onClose={() => setIsFaceModalOpen(false)}
         mode="register"
         userEmail={user?.email}
         userId={user?.id}
         onSuccess={() => {
-          setFaceIdEnabled(true);
-          setIsFaceModalOpen(false);
-          showToast("Face ID enabled successfully!", "success");
+            setFaceIdEnabled(true);
+            setIsFaceModalOpen(false);
+            showToast("Face ID enabled successfully!", "success");
         }}
       />
+      
+      <style>{`
+        .animate-in {
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+        .fade-in { animation-name: fadeIn; }
+        .slide-in-from-right-4 { animation-name: slideInFromRight; }
+        .zoom-in-95 { animation-name: zoomIn; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInFromRight { from { transform: translateX(20px); } to { transform: translateX(0); } }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      `}</style>
+
     </div>
   );
 }

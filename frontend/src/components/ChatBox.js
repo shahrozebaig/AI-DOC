@@ -110,9 +110,8 @@ function ChatBox() {
       <div className="relative flex items-end bg-white rounded-2xl shadow-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all z-20">
         <button
           onClick={toggleListening}
-          className={`p-4 transition-colors mb-[2px] ${
-            isListening ? "text-red-500 animate-pulse" : "text-gray-400 hover:text-primary"
-          }`}
+          className={`p-4 transition-colors mb-[2px] ${isListening ? "text-red-500 animate-pulse" : "text-gray-400 hover:text-primary"
+            }`}
           title="Voice Command"
         >
           <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

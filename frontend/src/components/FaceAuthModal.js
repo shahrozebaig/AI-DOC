@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import axios from 'axios';
 
-const FaceAuthModal = ({ isOpen, onClose, mode, userEmail, userId, onSuccess }) => {
+const FaceAuthModal = ({ isOpen, onClose, mode = 'login', userEmail = '', userId = '', onSuccess }) => {
   const webcamRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,6 +21,7 @@ const FaceAuthModal = ({ isOpen, onClose, mode, userEmail, userId, onSuccess }) 
       : { email: userEmail, image: imageSrc };
 
     try {
+      console.log(`Face Auth [${mode}] Payload:`, { email: userEmail, userId, endpoint });
       // Note: adjust the base URL as needed (e.g. backend URL from .env)
       const response = await axios.post(`http://localhost:8000${endpoint}`, payload);
       setLoading(false);
