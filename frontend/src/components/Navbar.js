@@ -8,7 +8,6 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
   const isLandingPage = location.pathname === "/";
   const isDashboard = location.pathname === "/dashboard";
 
@@ -57,16 +56,7 @@ function Navbar() {
 
       {/* RIGHT: ACTIONS */}
       <div className="flex items-center gap-6">
-        {isAuthPage && (
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all"
-          >
-            <span>←</span> Back to site
-          </button>
-        )}
-
-        {user && !isAuthPage && (
+        {user && !isDashboard && (
           <div className="flex items-center gap-8">
             {!isDashboard && (
                 <button
@@ -89,7 +79,7 @@ function Navbar() {
           </div>
         )}
 
-        {!user && !isAuthPage && (
+        {!user && isLandingPage && (
           <div className="flex items-center gap-6">
             <Link to="/login" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
               Login

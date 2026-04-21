@@ -2,14 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useToast } from "../context/ToastContext";
-import Navbar from "../components/Navbar";
+import AuthLayout from "../components/AuthLayout";
 import { Mail, ArrowLeft, KeyRound, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const navigate = useNavigate();
+
   const handleReset = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -26,18 +28,10 @@ function ForgotPassword() {
       setLoading(false);
     }
   };
+
   return (
-    <div className="min-h-screen bg-[#080808] flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30">
-      <Navbar />
-      {/* BACKGROUND DECOR */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full" />
-      </div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[400px] z-10"
-      >
+    <AuthLayout>
+      <div className="w-full max-w-[400px] z-10">
         <button
           onClick={() => navigate("/login")}
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all mb-8 group"
@@ -45,6 +39,7 @@ function ForgotPassword() {
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           Back to login
         </button>
+
         {/* LOGO & TITLE */}
         <div className="text-center mb-10">
           <div className="inline-flex p-3 rounded-2xl bg-white/5 border border-white/10 mb-4 shadow-xl text-blue-400">
@@ -55,6 +50,7 @@ function ForgotPassword() {
             Enter your email and we'll send you a link to reset your password.
           </p>
         </div>
+
         {/* CARD */}
         <div className="bg-[#0c0c0c] border border-white/[0.05] rounded-[28px] p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] backdrop-blur-3xl relative overflow-hidden group">
           <form onSubmit={handleReset} className="space-y-6">
@@ -74,6 +70,7 @@ function ForgotPassword() {
                 />
               </div>
             </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -83,11 +80,13 @@ function ForgotPassword() {
             </button>
           </form>
         </div>
+
         <p className="text-center mt-8 text-[11px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
           Secure multi-factor recovery system enabled
         </p>
-      </motion.div>
-    </div>
+      </div>
+    </AuthLayout>
   );
 }
+
 export default ForgotPassword;

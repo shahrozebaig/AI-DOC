@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
 import { useToast } from "../context/ToastContext";
-import Navbar from "../components/Navbar";
+import AuthLayout from "../components/AuthLayout";
 import { ShieldCheck, Lock, Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -31,6 +31,7 @@ function ResetPassword() {
     };
     checkMfaStatus();
   }, []);
+
   const handleReset = async () => {
     if (!password || !confirmPassword) {
       return showToast("Please fill in all password fields.");
@@ -72,17 +73,10 @@ function ResetPassword() {
       setLoading(false);
     }
   };
+
   return (
-    <div className="min-h-screen bg-[#080808] flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30">
-      <Navbar />
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
-      </div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[420px] z-10"
-      >
+    <AuthLayout>
+      <div className="w-full max-w-[420px] z-10">
         <div className="text-center mb-10">
           <div className="inline-flex p-3 rounded-2xl bg-white/5 border border-white/10 mb-4 shadow-xl">
             <ShieldCheck className="text-emerald-500" size={28} />
@@ -90,6 +84,7 @@ function ResetPassword() {
           <h1 className="text-3xl font-bold text-white tracking-tighter">Security Update</h1>
           <p className="text-gray-500 text-sm mt-2 font-medium uppercase tracking-widest text-[10px]">Define your new access credentials</p>
         </div>
+        
         <div className="bg-[#0c0c0c] border border-white/[0.05] rounded-[32px] p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] backdrop-blur-3xl relative overflow-hidden group">
           <div className="space-y-6">
             <div className="space-y-2">
@@ -113,6 +108,7 @@ function ResetPassword() {
                 </button>
               </div>
             </div>
+            
             <div className="space-y-2">
               <label className="text-[10px] uppercase font-bold tracking-widest text-gray-500 ml-1">Confirm Identity</label>
               <div className="relative group/field">
@@ -127,6 +123,7 @@ function ResetPassword() {
                 />
               </div>
             </div>
+
             <AnimatePresence>
               {mfaEnabled && (
                 <motion.div
@@ -150,6 +147,7 @@ function ResetPassword() {
                 </motion.div>
               )}
             </AnimatePresence>
+
             <button
               onClick={handleReset}
               disabled={loading}
@@ -166,8 +164,9 @@ function ResetPassword() {
         <p className="text-center mt-8 text-[11px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
           Neural encryption active for this session
         </p>
-      </motion.div>
-    </div>
+      </div>
+    </AuthLayout>
   );
 }
+
 export default ResetPassword;
