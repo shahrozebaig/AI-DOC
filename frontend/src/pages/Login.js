@@ -81,11 +81,11 @@ function Login() {
       } else if (msg === "Invalid login credentials") {
         msg = "Invalid Credentials. Please try again.";
       }
-      
+
       if (error.message.toLowerCase().includes("email") || error.message.toLowerCase().includes("user")) setErrorField("email");
       else if (error.message.toLowerCase().includes("password")) setErrorField("password");
       else setErrorField("both");
-      
+
       showToast(msg);
     }
   };
@@ -115,10 +115,10 @@ function Login() {
     if (!email) return setErrorField("email");
     setErrorField("");
     setResetLoading(true);
-    
+
     const { error } = await resetPassword(email);
     setResetLoading(false);
-    
+
     if (error) {
       showToast(error.message);
     } else {
@@ -135,9 +135,9 @@ function Login() {
 
           {/* LEFT: Branding */}
           <div className="hidden md:flex w-2/5 relative overflow-hidden group">
-            <img 
-              src="/Login.jpeg" 
-              alt="Login Visual" 
+            <img
+              src="/Login.jpeg"
+              alt="Login Visual"
               className="absolute inset-0 w-full h-full object-cover object-left transform group-hover:scale-110 transition-transform duration-[20s] ease-linear"
             />
             {/* Subtle Overlay to blend with the rest of the dark theme */}
@@ -174,62 +174,62 @@ function Login() {
                   Verify code
                 </button>
 
-                  <button
-                    onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }}
-                    className="text-sm text-gray-500 font-medium hover:text-black transition-colors"
-                  >
-                    Back to Login Page
-                  </button>
+                <button
+                  onClick={async () => { await supabase.auth.signOut(); window.location.href = "/login"; }}
+                  className="text-sm text-gray-500 font-medium hover:text-black transition-colors"
+                >
+                  Back to Login Page
+                </button>
+              </div>
+            ) : isForgotPassword ? (
+              <div className="flex flex-col h-full justify-center">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password</h2>
+                  <p className="text-sm text-gray-500">
+                    {resetEmailSent
+                      ? "Check your inbox for a password reset link."
+                      : "Enter your email and we'll send you a link to reset your password."}
+                  </p>
                 </div>
-              ) : isForgotPassword ? (
-                <div className="flex flex-col h-full justify-center">
-                  <div className="mb-8">
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password</h2>
-                      <p className="text-sm text-gray-500">
-                          {resetEmailSent 
-                              ? "Check your inbox for a password reset link." 
-                              : "Enter your email and we'll send you a link to reset your password."}
-                      </p>
+
+                {!resetEmailSent ? (
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email Address</label>
+                      <input
+                        type="email"
+                        placeholder="you@example.com"
+                        className={`w-full p-3.5 bg-gray-50 border rounded-xl outline-none transition-colors ${errorField === "email" ? "border-red-500" : "border-gray-200 focus:border-primary"}`}
+                        value={email}
+                        onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
+                        onKeyDown={(e) => e.key === 'Enter' && handleForgotPassword()}
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleForgotPassword}
+                      disabled={resetLoading}
+                      className="w-full bg-black text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition-colors active:scale-[0.98]"
+                    >
+                      {resetLoading ? "Sending..." : "Send Reset Link"}
+                    </button>
                   </div>
+                ) : (
+                  <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-emerald-700 text-sm mb-6 flex items-start gap-3">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <p>Success! We've sent a recovery link to <strong>{email}</strong>. Please check your spam folder if you don't see it.</p>
+                  </div>
+                )}
 
-                  {!resetEmailSent ? (
-                      <div className="space-y-6">
-                          <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email Address</label>
-                              <input
-                                  type="email"
-                                  placeholder="you@example.com"
-                                  className={`w-full p-3.5 bg-gray-50 border rounded-xl outline-none transition-colors ${errorField === "email" ? "border-red-500" : "border-gray-200 focus:border-primary"}`}
-                                  value={email}
-                                  onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
-                                  onKeyDown={(e) => e.key === 'Enter' && handleForgotPassword()}
-                              />
-                          </div>
-
-                          <button
-                              onClick={handleForgotPassword}
-                              disabled={resetLoading}
-                              className="w-full bg-black text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition-colors active:scale-[0.98]"
-                          >
-                              {resetLoading ? "Sending..." : "Send Reset Link"}
-                          </button>
-                      </div>
-                  ) : (
-                      <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-emerald-700 text-sm mb-6 flex items-start gap-3">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                          <p>Success! We've sent a recovery link to <strong>{email}</strong>. Please check your spam folder if you don't see it.</p>
-                      </div>
-                  )}
-
-                  <button
-                      onClick={() => { setIsForgotPassword(false); setResetEmailSent(false); }}
-                      className="w-full text-gray-500 text-sm font-medium hover:text-black transition-colors mt-6 py-2 text-center"
-                  >
-                      Back to Login Page
-                  </button>
-                </div>
-              ) : (
-                <>
+                <button
+                  onClick={() => { setIsForgotPassword(false); setResetEmailSent(false); }}
+                  className="w-full text-gray-500 text-sm font-medium hover:text-black transition-colors mt-6 py-2 text-center"
+                >
+                  Back to Login Page
+                </button>
+              </div>
+            ) : (
+              <>
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
                   <p className="text-sm text-gray-500">Welcome back! Please enter your details.</p>
@@ -257,11 +257,11 @@ function Login() {
                 <div className="mb-6">
                   <button
                     onClick={() => {
-                        if (!email) {
-                            showToast("Please enter your email address first to use Face ID login.");
-                            return;
-                        }
-                        setIsFaceModalOpen(true);
+                      if (!email) {
+                        showToast("Please enter your email address first to use Face ID login.");
+                        return;
+                      }
+                      setIsFaceModalOpen(true);
                     }}
                     className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-[0.98]"
                   >

@@ -1,163 +1,152 @@
-import { useState } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ChatBox from "../components/ChatBox";
 import FileUpload from "../components/FileUpload";
-
+import { AuthContext } from "../context/AuthContext";
+import { getChatSessions } from "../services/chat";
+import {
+  Upload,
+  User,
+  Settings as SettingsIcon,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare
+} from "lucide-react";
 function Dashboard() {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [sessions, setSessions] = useState([]);
+  const [currentSessionId] = useState(null);
+
+  const loadSessions = useCallback(async () => {
+    if (!user) return;
+    try {
+      const data = await getChatSessions(user.id);
+      setSessions(data);
+    } catch (err) {
+      console.error("Failed to load sessions", err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
 
   return (
-    <div className="min-h-screen bg-hero text-white pt-20 relative">
-
-      {/* BACKGROUND GLOW */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 pointer-events-none" />
-
+    <div className="flex h-screen bg-[#080808] text-gray-200 overflow-hidden font-sans">
       <Navbar />
 
-      <div className="flex max-w-7xl mx-auto px-4 gap-4 relative z-10">
-
-        {/* SIDEBAR */}
-        <div
-          style={{
-            transition: "width 0.3s ease",
-            width: collapsed ? "64px" : "260px",
-            flexShrink: 0,
-          }}
-          className="hidden md:flex flex-col justify-between"
+      {/* SIDEBAR */}
+      <aside
+        className={`relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-all duration-300 ease-in-out mt-16 z-30 ${collapsed ? "w-20" : "w-72"
+          }`}
+      >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-6 bg-[#111111] border border-white/10 rounded-full p-1 text-gray-500 hover:text-white transition-colors z-40"
         >
-          {/* TOP */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-
-            {/* COLLAPSE BUTTON */}
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 10px",
-                borderRadius: "10px",
-                border: "0.5px solid rgba(255,255,255,0.1)",
-                background: "rgba(255,255,255,0.05)",
-                color: "#9ca3af",
-                cursor: "pointer",
-                fontSize: "12px",
-                fontWeight: 500,
-                justifyContent: collapsed ? "center" : "flex-start",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-            >
-              <span style={{ fontSize: "14px", transform: collapsed ? "rotate(180deg)" : "none", transition: "transform 0.3s ease" }}>⬅️</span>
-              {!collapsed && <span>Collapse</span>}
-            </button>
+          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        </button>
 
 
-            {/* UPLOAD */}
+
+        {/* Action Header - NOW UPLOAD (Centered) */}
+        <div className={`flex-1 flex flex-col justify-center ${collapsed ? "items-center px-2" : "p-6"}`}>
+          <div className="space-y-4 w-full">
             {!collapsed && (
-              <div
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  backdropFilter: "blur(12px)",
-                  borderRadius: "14px",
-                  padding: "16px",
-                  border: "0.5px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                  <span style={{ fontSize: "16px" }}>📂</span>
-                  <h3 style={{ fontSize: "12px", fontWeight: 600, color: "#d1d5db", margin: 0, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-                    Upload File
-                  </h3>
-                </div>
-                <FileUpload />
+              <div className="flex flex-col items-center gap-2 mb-2 animate-in fade-in duration-500">
+                <Upload size={18} className="text-emerald-500" />
+                <h3 className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Document Hub</h3>
               </div>
             )}
 
+            <div className={`bg-white/5 border border-white/10 transition-all group cursor-pointer shadow-lg ${collapsed ? "rounded-xl p-3" : "rounded-2xl p-4 hover:border-emerald-500/30"
+              }`}>
+              <FileUpload isCollapsed={collapsed} />
+            </div>
+
+            {!collapsed && (
+              <p className="text-[10px] text-gray-600 text-center px-4 leading-relaxed tracking-wider italic animate-in fade-in duration-500">
+                All analyzed data remains locally indexed for this session.
+              </p>
+            )}
           </div>
         </div>
 
-        {/* MAIN CHAT */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <div
-            style={{
-              background: "rgba(18, 18, 23, 0.75)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              borderRadius: "24px",
-              padding: "0",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5)",
-              display: "flex",
-              flexDirection: "column",
-              height: "85vh",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {/* HEADER */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderBottom: "0.5px solid rgba(255,255,255,0.08)",
-                padding: "16px 20px",
-              }}
+        {/* BOTTOM SECTION */}
+        <div className="p-3 border-t border-white/5 space-y-1">
+          <div className={`flex flex-col gap-1 ${collapsed ? "items-center" : ""}`}>
+            <button
+              onClick={() => navigate("/settings")}
+              className="w-full flex items-center gap-3 py-3 px-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-all"
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div
-                  style={{
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "10px",
-                    background: "rgba(255,255,255,0.05)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    fontSize: "20px"
-                  }}
-                >
-                  🤖
-                </div>
-                <div>
-                  <h2 style={{ fontSize: "15px", fontWeight: 600, margin: 0, color: "white" }}>AI Assistant</h2>
-                  <p style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}>Chat with your documents</p>
-                </div>
+              <SettingsIcon size={18} />
+              {!collapsed && <span className="text-xs font-medium">Settings</span>}
+            </button>
+            <div className={`flex items-center gap-3 py-3 px-3 bg-white/5 border border-white/5 rounded-xl ${collapsed ? "p-3" : ""}`}>
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shrink-0">
+                <User size={16} />
               </div>
-
+              {!collapsed && (
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">User Account</p>
+                  <p className="text-xs font-semibold text-white truncate">{user?.email}</p>
+                </div>
+              )}
             </div>
-
-            {/* CHAT */}
-            <div style={{ flex: 1, overflow: "hidden", padding: "16px 24px 24px", display: "flex", flexDirection: "column", zIndex: 10 }}>
-              <ChatBox />
-            </div>
-
-            {/* BOTTOM GLOW */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: "80px",
-                background: "linear-gradient(to top, rgba(0,0,0,0.3), transparent)",
-                pointerEvents: "none",
-              }}
-            />
           </div>
         </div>
+      </aside>
 
-      </div>
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 flex flex-col h-full pt-16 relative">
+        {/* Background Accent */}
+        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
+        {/* HEADER */}
+        <header className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
+              <MessageSquare size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white tracking-tight leading-tight">
+                {sessions.find(s => s.id === currentSessionId)?.title || "AI Assistant"}
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Space for right header actions */}
+          </div>
+        </header>
+
+        {/* CHAT INTERFACE */}
+        <section className="flex-1 relative overflow-hidden flex flex-col h-full px-4 md:px-12 py-6">
+          <div className="flex-1 overflow-hidden z-10">
+            <ChatBox sessionId={currentSessionId} onSessionCreated={loadSessions} />
+          </div>
+        </section>
+
+        <style>{`
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+        `}</style>
+      </main>
     </div>
   );
 }

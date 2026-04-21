@@ -5,22 +5,17 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* PUBLIC ROUTES */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-
-        {/* ✅ RESET PASSWORD (PUBLIC) */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-
-        {/* PROTECTED ROUTES */}
         <Route
           path="/dashboard"
           element={
@@ -29,7 +24,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/settings"
           element={
@@ -38,10 +32,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );
 }
-
 export default App;

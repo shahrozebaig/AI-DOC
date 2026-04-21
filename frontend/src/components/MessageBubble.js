@@ -1,40 +1,40 @@
 import { motion } from "framer-motion";
-
-function MessageBubble({ message, isUser }) {
+import { User, Sparkles, AlertCircle } from "lucide-react";
+function MessageBubble({ message, isUser, isError }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`flex items-end gap-2 ${
-        isUser ? "justify-end" : "justify-start"
-      } mb-3`}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className={`flex gap-4 w-full ${isUser ? "flex-row-reverse" : "flex-row"}`}
     >
-      {/* 🤖 AI ICON */}
-      {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white text-sm">
-          🤖
+      {/* ICON WRAPPER */}
+      <div className="shrink-0 mt-1">
+        <div
+          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 ${isUser
+              ? "bg-white/5 border border-white/10 text-white shadow-lg"
+              : isError
+                ? "bg-red-500/10 border border-red-500/20 text-red-400"
+                : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 shadow-emerald-500/5 shadow-xl"
+            }`}
+        >
+          {isUser ? <User size={18} /> : isError ? <AlertCircle size={18} /> : <Sparkles size={18} />}
         </div>
-      )}
-
-      {/* MESSAGE */}
-      <div
-        className={`px-4 py-2 rounded-xl max-w-xs text-sm ${
-          isUser
-            ? "bg-primary text-black"
-            : "bg-white/80 text-black backdrop-blur"
-        }`}
-      >
-        {message}
       </div>
-
-      {/* 👤 USER ICON */}
-      {isUser && (
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-black text-sm">
-          👤
+      {/* MESSAGE TEXT */}
+      <div className={`flex flex-col max-w-[85%] md:max-w-[70%] space-y-1.5 ${isUser ? "items-end" : "items-start"}`}>
+        <div
+          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 ${isUser
+              ? "bg-white text-black font-medium rounded-tr-none"
+              : isError
+                ? "bg-red-950/20 text-red-200 border border-red-500/20 rounded-tl-none font-medium"
+                : "bg-white/5 border border-white/[0.05] text-gray-200 rounded-tl-none hover:bg-white/[0.07]"
+            }`}
+        >
+          {message}
         </div>
-      )}
+      </div>
     </motion.div>
   );
 }
-
 export default MessageBubble;

@@ -9,30 +9,24 @@ import {
 } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
-
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorField, setErrorField] = useState("");
-
   const navigate = useNavigate();
   const { showToast } = useToast();
-
   const handleSignup = async () => {
     if (!email) return setErrorField("email");
     if (!password) return setErrorField("password");
     if (!confirmPassword) return setErrorField("confirmPassword");
-
     if (password !== confirmPassword) {
       setErrorField("confirmPassword");
       return showToast("Passwords do not match");
     }
     setErrorField("");
-
     const { error } = await signUp(email, password);
-
     if (error) {
       if (error.message.toLowerCase().includes("email")) {
         setErrorField("email");
@@ -48,19 +42,18 @@ function Signup() {
       navigate("/login");
     }
   };
-
   return (
     <div className="relative min-h-screen">
       <AuthBackground />
 
       <AuthLayout>
         <div className="flex w-full max-w-4xl bg-white/95 backdrop-blur-xl rounded-[24px] shadow-2xl overflow-hidden mx-4 min-h-[550px] border border-white/20">
-          
+
           {/* LEFT: Branding */}
           <div className="hidden md:flex w-2/5 relative overflow-hidden group">
-            <img 
-              src="/Signup.jpeg" 
-              alt="Signup Visual" 
+            <img
+              src="/Signup.jpeg"
+              alt="Signup Visual"
               className="absolute inset-0 w-full h-full object-cover object-left transform group-hover:scale-110 transition-transform duration-[20s] ease-linear"
             />
             {/* Subtle Overlay */}
@@ -69,7 +62,7 @@ function Signup() {
 
           {/* RIGHT: Form */}
           <div className="w-full md:w-3/5 p-8 sm:p-12 flex flex-col justify-center">
-            
+
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Create an account</h2>
               <p className="text-sm text-gray-500">Sign up to get started today.</p>
@@ -107,9 +100,8 @@ function Signup() {
                 <input
                   type="email"
                   placeholder="you@example.com"
-                  className={`w-full p-3 bg-gray-50 border rounded-xl outline-none transition-colors ${
-                    errorField === "email" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
-                  }`}
+                  className={`w-full p-3 bg-gray-50 border rounded-xl outline-none transition-colors ${errorField === "email" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                    }`}
                   onChange={(e) => { setEmail(e.target.value); setErrorField(''); }}
                 />
               </div>
@@ -121,16 +113,15 @@ function Signup() {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${
-                      errorField === "password" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
-                    }`}
+                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${errorField === "password" || errorField === "both" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                      }`}
                     onChange={(e) => { setPassword(e.target.value); setErrorField(''); }}
                   />
                   <button
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                   </button>
                 </div>
               </div>
@@ -142,9 +133,8 @@ function Signup() {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${
-                      errorField === "confirmPassword" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
-                    }`}
+                    className={`w-full p-3 pr-10 bg-gray-50 border rounded-xl outline-none transition-colors ${errorField === "confirmPassword" ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                      }`}
                     onChange={(e) => { setConfirmPassword(e.target.value); setErrorField(''); }}
                   />
                 </div>

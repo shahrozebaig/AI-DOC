@@ -1,16 +1,16 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { ChevronRight } from "lucide-react";
 
 function Navbar() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAuthPage =
-    location.pathname === "/login" || location.pathname === "/signup";
-
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
   const isLandingPage = location.pathname === "/";
+  const isDashboard = location.pathname === "/dashboard";
 
   const getInitials = () => {
     if (!user?.email) return "U";
@@ -26,86 +26,84 @@ function Navbar() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4">
-
-      {/* LEFT */}
-      <Link to="/" className="flex items-center">
+    <nav className="fixed top-0 left-0 right-0 z-[100] flex justify-between items-center px-6 md:px-10 py-5 bg-black/40 backdrop-blur-xl border-b border-white/[0.03]">
+      {/* LEFT: LOGO */}
+      <Link to="/" className="group flex items-center">
         <img 
-          src="/Logo.jpeg" 
-          alt="DocuMind AI Logo" 
-          className="h-10 w-auto rounded-lg object-contain border border-white/5 shadow-md hover:scale-105 transition-transform"
+            src="/Logo.jpeg" 
+            alt="DocuMind AI" 
+            className="h-11 w-auto rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
         />
       </Link>
 
       {/* CENTER (LANDING ONLY) */}
       {isLandingPage && !user && (
-        <div className="hidden md:flex gap-6 text-gray-300">
+        <div className="hidden md:flex gap-8 items-center bg-white/5 px-6 py-2 rounded-full border border-white/[0.05]">
           <button
             onClick={() => scrollToSection("features")}
-            className="hover:text-white"
+            className="text-[11px] uppercase font-bold tracking-widest text-gray-500 hover:text-white transition-colors"
           >
             Features
           </button>
-
+          <div className="w-[1px] h-3 bg-white/10" />
           <button
             onClick={() => scrollToSection("how")}
-            className="hover:text-white"
+            className="text-[11px] uppercase font-bold tracking-widest text-gray-500 hover:text-white transition-colors"
           >
-            How It Works
+            How it works
           </button>
         </div>
       )}
 
-      {/* RIGHT */}
-      <div className="flex items-center gap-4">
-
-        {/* 🔥 FIXED BACK BUTTON */}
+      {/* RIGHT: ACTIONS */}
+      <div className="flex items-center gap-6">
         {isAuthPage && (
           <button
             onClick={() => navigate("/")}
-            className="bg-black/70 text-white px-4 py-2 rounded hover:bg-black transition"
+            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all"
           >
-            ← Back
+            <span>←</span> Back to site
           </button>
         )}
 
-        {/* DASHBOARD */}
         {user && !isAuthPage && (
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => navigate("/settings")}
-              className="text-gray-300 font-medium hover:text-white transition-colors"
-            >
-              Settings
-            </button>
-
+          <div className="flex items-center gap-8">
+            {!isDashboard && (
+                <button
+                onClick={() => navigate("/dashboard")}
+                className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors flex items-center gap-2"
+                >
+                Go to Dashboard <ChevronRight size={14} />
+                </button>
+            )}
+            
             <button 
-              onClick={() => navigate("/dashboard")}
-              className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-green-400 text-black flex items-center justify-center font-bold text-sm shadow-[0_0_15px_rgba(74,222,128,0.4)] hover:scale-105 transition-transform"
+              onClick={() => navigate("/settings")}
+              className="group flex items-center gap-3 bg-white/5 hover:bg-white/10 px-1 py-1 pr-4 rounded-full border border-white/5 transition-all active:scale-95"
             >
-              {getInitials()}
+              <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold text-[10px] tracking-tighter">
+                {getInitials()}
+              </div>
+              <span className="text-xs font-bold text-gray-300 group-hover:text-white">Profile</span>
             </button>
           </div>
         )}
 
-        {/* NOT LOGGED IN */}
         {!user && !isAuthPage && (
-          <>
-            <Link to="/login" className="text-gray-300 hover:text-white">
+          <div className="flex items-center gap-6">
+            <Link to="/login" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
               Login
             </Link>
-
             <Link
               to="/signup"
-              className="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700 text-white"
+              className="bg-white text-black px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-white/5"
             >
-              Sign Up
+              Get Started
             </Link>
-          </>
+          </div>
         )}
-
       </div>
-    </div>
+    </nav>
   );
 }
 
