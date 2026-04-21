@@ -53,35 +53,6 @@ function Dashboard() {
               {!collapsed && <span>Collapse</span>}
             </button>
 
-            {/* LOGO */}
-            {!collapsed && (
-              <div
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  backdropFilter: "blur(12px)",
-                  borderRadius: "14px",
-                  padding: "16px",
-                  border: "0.5px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-                  <img 
-                    src="/Logo.jpeg" 
-                    alt="DocuMind Logo" 
-                    className="h-10 w-auto rounded-lg object-contain border border-white/5 shadow-md"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* COLLAPSED LOGO ICON */}
-            {collapsed && (
-              <img 
-                src="/Logo.jpeg" 
-                alt="DocuMind Logo" 
-                className="w-full h-auto px-2 rounded-lg object-contain hover:scale-110 transition-transform"
-              />
-            )}
 
             {/* UPLOAD */}
             {!collapsed && (
@@ -105,25 +76,6 @@ function Dashboard() {
             )}
 
           </div>
-
-          {/* FOOTER */}
-          {!collapsed && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                padding: "10px",
-                borderRadius: "10px",
-                background: "rgba(255,255,255,0.03)",
-                border: "0.5px solid rgba(255,255,255,0.07)",
-              }}
-            >
-              <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#a78bfa" }} />
-              <span style={{ fontSize: "11px", color: "#6b7280" }}>Powered by AI</span>
-            </div>
-          )}
         </div>
 
         {/* MAIN CHAT */}
@@ -176,28 +128,6 @@ function Dashboard() {
                 </div>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  padding: "5px 10px",
-                  borderRadius: "20px",
-                  background: "rgba(74,222,128,0.1)",
-                  border: "0.5px solid rgba(74,222,128,0.2)",
-                }}
-              >
-                <div
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "50%",
-                    background: "#4ade80",
-                    animation: "pulse 2s infinite",
-                  }}
-                />
-                <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: 500 }}>Online</span>
-              </div>
             </div>
 
             {/* CHAT */}

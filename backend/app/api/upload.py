@@ -15,6 +15,9 @@ async def upload_files(files: List[UploadFile] = File(...)):
             f.write(await file.read())
     
     # Re-index EVERYTHING in the directory
-    load_and_index(UPLOAD_DIR)
+    success = load_and_index(UPLOAD_DIR)
     
-    return {"message": f"{len(files)} files uploaded and indexed"}
+    if not success:
+        return {"message": f"{len(files)} files uploaded but indexing FAILED. Please check server logs.", "error": True}
+
+    return {"message": f"{len(files)} files uploaded and indexed successfully", "error": False}
