@@ -10,7 +10,7 @@ DocuMind AI is an advanced document-based conversational platform that enables u
 
 ## 🎥 Demo
 
-https://github.com/user-attachments/assets/b2df5338-e514-42ab-870c-91419b50320d
+https://github.com/user-attachments/assets/5132ed52-c7df-4a19-9a0e-2144bfa91d0b
 
 ---
 
