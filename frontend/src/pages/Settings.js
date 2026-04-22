@@ -150,6 +150,32 @@ function Settings() {
     if (loginError) {
       return showToast("Current password is incorrect");
     }
+
+    // If they already have a verified factor, just re-enable it!
+    if (mfaUnenrollFactorId) {
+      const { error } = await supabase.auth.updateUser({ data: { is_mfa_enabled: true } });
+      if (error) {
+        return showToast(String(error.message));
+      }
+      setMfaEnabled(true);
+      setMfaSetupStep("idle");
+      showToast("2FA Re-enabled successfully", "success");
+      return; // Stop here, no need to show QR code
+    }
+
+    // Clean up all existing factors to prevent "factor already exists" error
+    try {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      if (factors) {
+        const allFactors = factors.all || factors.totp || [];
+        for (const factor of allFactors) {
+          await supabase.auth.mfa.unenroll({ factorId: factor.id });
+        }
+      }
+    } catch (err) {
+      console.error("Cleanup factors failed", err);
+    }
+
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
     if (error) return showToast(String(error.message));
     setMfaQrCode(data.totp.qr_code);
@@ -193,6 +219,8 @@ function Settings() {
       return showToast("Current password is incorrect");
     }
 
+    // We only disable enforcement in user metadata, we don't unenroll the factor 
+    // so they can quickly re-enable it later without scanning a new QR code.
     const { error } = await supabase.auth.updateUser({
       data: { is_mfa_enabled: false }
     });
