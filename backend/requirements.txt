@@ -18,3 +18,4 @@ face_recognition_models
 Click>=6.0
 Pillow
 opencv-python-headless<4.10.0.0
+python-multipart
