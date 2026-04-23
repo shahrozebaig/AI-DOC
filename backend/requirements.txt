@@ -3,7 +3,8 @@ uvicorn
 python-dotenv
 llama-index
 llama-index-llms-groq
-llama-index-embeddings-huggingface
+llama-index-embeddings-fastembed
+fastembed
 llama-index-vector-stores-faiss
 faiss-cpu
 supabase

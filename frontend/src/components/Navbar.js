@@ -24,16 +24,23 @@ function Navbar() {
     }
   };
 
+  const isSettings = location.pathname === "/settings";
+  const hideLogo = isDashboard || isSettings;
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] flex justify-between items-center px-6 md:px-10 py-5 bg-black/40 backdrop-blur-xl border-b border-white/[0.03]">
       {/* LEFT: LOGO */}
-      <Link to="/" className="group flex items-center">
-        <img 
-            src="/Logo.jpeg" 
-            alt="DocuMind AI" 
-            className="h-11 w-auto rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
-        />
-      </Link>
+      <div className="flex-1">
+        {!hideLogo && (
+          <Link to="/" className="group flex items-center w-fit">
+            <img 
+                src="/Logo.jpeg" 
+                alt="DocuMind AI" 
+                className="h-11 w-auto rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
+            />
+          </Link>
+        )}
+      </div>
 
       {/* CENTER (LANDING ONLY) */}
       {isLandingPage && !user && (

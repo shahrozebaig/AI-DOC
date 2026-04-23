@@ -38,17 +38,28 @@ function Dashboard() {
     <div className="flex h-screen bg-[#080808] text-gray-200 overflow-hidden font-sans">
       <Navbar />
 
+      {/* MOBILE OVERLAY */}
+      {!collapsed && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/60 z-30 backdrop-blur-sm mt-16"
+          onClick={() => setCollapsed(true)}
+        />
+      )}
+
       {/* SIDEBAR */}
       <aside
-        className={`relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-all duration-300 ease-in-out mt-16 z-30 ${collapsed ? "w-20" : "w-72"
-          }`}
+        className={`absolute md:relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-transform md:transition-all duration-300 ease-in-out mt-16 h-[calc(100vh-4rem)] z-40 ${
+          collapsed ? "-translate-x-full md:translate-x-0 w-72 md:w-20" : "translate-x-0 w-80 md:w-72"
+        }`}
       >
         {/* Toggle Button */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-6 bg-[#111111] border border-white/10 rounded-full p-1 text-gray-500 hover:text-white transition-colors z-40"
+          className={`absolute top-6 bg-[#111111] border border-white/10 rounded-full p-1.5 md:p-1 text-gray-400 hover:text-white transition-all z-50 shadow-xl ${
+            collapsed ? "-right-12 md:-right-3" : "-right-3 md:-right-3"
+          }`}
         >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          {collapsed ? <ChevronRight size={16} className="md:w-3.5 md:h-3.5" /> : <ChevronLeft size={16} className="md:w-3.5 md:h-3.5" />}
         </button>
 
 
@@ -102,7 +113,7 @@ function Dashboard() {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col h-full pt-16 relative">
+      <main className="flex-1 flex flex-col h-full pt-16 relative w-full min-w-0 overflow-hidden">
         {/* Background Accent */}
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
 
@@ -125,8 +136,8 @@ function Dashboard() {
         </header>
 
         {/* CHAT INTERFACE */}
-        <section className="flex-1 relative overflow-hidden flex flex-col h-full px-4 md:px-12 py-6">
-          <div className="flex-1 overflow-hidden z-10">
+        <section className="flex-1 relative flex flex-col h-full w-full min-w-0 overflow-hidden">
+          <div className="flex-1 overflow-hidden z-10 h-full w-full">
             <ChatBox sessionId={currentSessionId} onSessionCreated={loadSessions} />
           </div>
         </section>
