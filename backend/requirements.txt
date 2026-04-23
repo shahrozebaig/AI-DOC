@@ -14,5 +14,7 @@ sentence-transformers
 numpy==1.26.4
 tabulate
 dlib-bin
-face-recognition
+face_recognition_models
+Click>=6.0
+Pillow
 opencv-python-headless<4.10.0.0
