@@ -7,6 +7,7 @@ llama-index-embeddings-huggingface
 llama-index-vector-stores-faiss
 faiss-cpu
 supabase
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 transformers
 sentence-transformers

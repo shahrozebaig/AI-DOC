@@ -151,7 +151,6 @@ function Settings() {
       return showToast("Current password is incorrect");
     }
 
-    // If they already have a verified factor, just re-enable it!
     if (mfaUnenrollFactorId) {
       const { error } = await supabase.auth.updateUser({ data: { is_mfa_enabled: true } });
       if (error) {
@@ -219,8 +218,6 @@ function Settings() {
       return showToast("Current password is incorrect");
     }
 
-    // We only disable enforcement in user metadata, we don't unenroll the factor 
-    // so they can quickly re-enable it later without scanning a new QR code.
     const { error } = await supabase.auth.updateUser({
       data: { is_mfa_enabled: false }
     });
