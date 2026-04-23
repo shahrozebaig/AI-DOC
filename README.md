@@ -45,6 +45,7 @@ Below is the visual overview of how **DocuMind AI** processes documents, manages
 | Frontend     | React.js, Tailwind CSS                          |
 | Backend      | FastAPI (Python)                                |
 | AI Model     | Groq LLaMA 3.1 8B Instant                       |
+| Embeddings   | FastEmbed (all-MiniLM-L6-v2)                    |
 | RAG Engine   | LlamaIndex                                      |
 | Vector Store | FAISS                                           |
 | Database     | Supabase                                        |
