@@ -19,6 +19,7 @@ function Settings() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const isOAuthUser = user?.app_metadata?.provider !== 'email';
   const [activeTab, setActiveTab] = useState("profile");
   const [email, setEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
@@ -110,13 +111,15 @@ function Settings() {
   };
 
   const startMfaSetup = async () => {
-    if (!mfaPassword) return showToast("Password is required");
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: mfaPassword,
-    });
-    if (loginError) {
-      return showToast("Current password is incorrect");
+    if (!isOAuthUser) {
+      if (!mfaPassword) return showToast("Password is required");
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: mfaPassword,
+      });
+      if (loginError) {
+        return showToast("Current password is incorrect");
+      }
     }
 
     if (mfaUnenrollFactorId) {
@@ -175,15 +178,15 @@ function Settings() {
   };
 
   const disableMfa = async () => {
-    if (!mfaPassword) return showToast("Password is required");
-
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: mfaPassword,
-    });
-
-    if (loginError) {
-      return showToast("Current password is incorrect");
+    if (!isOAuthUser) {
+      if (!mfaPassword) return showToast("Password is required");
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: mfaPassword,
+      });
+      if (loginError) {
+        return showToast("Current password is incorrect");
+      }
     }
 
     const { error } = await supabase.auth.updateUser({
@@ -202,15 +205,16 @@ function Settings() {
 
   const deleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") return showToast("Type DELETE to confirm");
-    if (!deletePassword) return showToast("Enter password");
 
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: deletePassword,
-    });
-
-    if (loginError) {
-      return showToast("Incorrect password");
+    if (!isOAuthUser) {
+      if (!deletePassword) return showToast("Enter password");
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: deletePassword,
+      });
+      if (loginError) {
+        return showToast("Incorrect password");
+      }
     }
 
     if (mfaEnabled && mfaUnenrollFactorId) {
@@ -368,34 +372,40 @@ function Settings() {
                   <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] uppercase font-bold tracking-wider rounded-full border border-emerald-500/20">Verified</span>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">New Email</label>
-                      <input
-                        type="email"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
-                        placeholder="Enter new email"
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
+                {!isOAuthUser ? (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">New Email</label>
+                        <input
+                          type="email"
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                          placeholder="Enter new email"
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
+                        <input
+                          type="password"
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                          placeholder="Confirm password"
+                          onChange={(e) => setEmailPassword(e.target.value)}
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
-                      <input
-                        type="password"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
-                        placeholder="Confirm password"
-                        onChange={(e) => setEmailPassword(e.target.value)}
-                      />
-                    </div>
+                    <button
+                      onClick={updateEmail}
+                      className="bg-white text-black text-sm font-bold px-6 py-3 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
+                    >
+                      Update Profile
+                    </button>
                   </div>
-                  <button
-                    onClick={updateEmail}
-                    className="bg-white text-black text-sm font-bold px-6 py-3 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
-                  >
-                    Update Profile
-                  </button>
-                </div>
+                ) : (
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-sm text-gray-400">
+                    You logged in using {user?.app_metadata?.provider}. Your email and profile information are managed securely by your provider.
+                  </div>
+                )}
               </section>
             </div>
           )}
@@ -410,37 +420,39 @@ function Settings() {
 
               <div className="grid grid-cols-1 gap-6">
                 {/* Password Section */}
-                <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Lock size={20} className="text-white" />
-                    <h3 className="text-lg font-bold text-white">Change Password</h3>
-                  </div>
+                {!isOAuthUser && (
+                  <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Lock size={20} className="text-white" />
+                      <h3 className="text-lg font-bold text-white">Change Password</h3>
+                    </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
-                      <input
-                        type="password"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
+                        <input
+                          type="password"
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">New Password</label>
+                        <input
+                          type="password"
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">New Password</label>
-                      <input
-                        type="password"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-white/30 outline-none transition-all"
-                        onChange={(e) => setNewPassword(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <button
-                    onClick={updatePassword}
-                    className="bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-white/10 transition-all active:scale-95"
-                  >
-                    Update Password
-                  </button>
-                </section>
+                    <button
+                      onClick={updatePassword}
+                      className="bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-white/10 transition-all active:scale-95"
+                    >
+                      Update Password
+                    </button>
+                  </section>
+                )}
 
 
                 {/* 2FA Section */}
@@ -462,7 +474,7 @@ function Settings() {
                   {!mfaEnabled ? (
                     mfaSetupStep === "idle" ? (
                       <button
-                        onClick={() => setMfaSetupStep("askPassword")}
+                        onClick={() => isOAuthUser ? startMfaSetup() : setMfaSetupStep("askPassword")}
                         className="w-full sm:w-auto bg-blue-600 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
                       >
                         Enable 2FA Protection
@@ -523,7 +535,7 @@ function Settings() {
                       </div>
                     ) : (
                       <button
-                        onClick={() => setMfaSetupStep("askPasswordDisable")}
+                        onClick={() => isOAuthUser ? disableMfa() : setMfaSetupStep("askPasswordDisable")}
                         className="text-xs text-gray-500 hover:text-red-400 transition-colors uppercase font-bold tracking-widest border border-white/5 px-4 py-2 rounded-lg hover:bg-red-500/5"
                       >
                         Disable Protection
@@ -567,15 +579,17 @@ function Settings() {
                               onChange={(e) => setDeleteConfirmText(e.target.value)}
                             />
                           </div>
-                          <div>
-                            <label className="text-xs font-bold text-red-400/60 uppercase tracking-widest mb-2 block">Your Password</label>
-                            <input
-                              type="password"
-                              className="w-full bg-black/60 border border-red-500/20 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none transition-all"
-                              placeholder="Account password"
-                              onChange={(e) => setDeletePassword(e.target.value)}
-                            />
-                          </div>
+                          { !isOAuthUser && (
+                            <div>
+                              <label className="text-xs font-bold text-red-400/60 uppercase tracking-widest mb-2 block">Your Password</label>
+                              <input
+                                type="password"
+                                className="w-full bg-black/60 border border-red-500/20 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none transition-all"
+                                placeholder="Account password"
+                                onChange={(e) => setDeletePassword(e.target.value)}
+                              />
+                            </div>
+                          )}
                         </div>
                         <div className="flex gap-4">
                           <button
