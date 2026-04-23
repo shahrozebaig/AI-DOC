@@ -21,23 +21,15 @@ def create_index(documents):
     vector_store = FaissVectorStore(faiss_index=faiss_index)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     
-    import gc
-    from llama_index.core.node_parser import SentenceSplitter
-    
-    # Initialize empty index safely
+    # Use standard insertion but highly constrained via Settings
     index = VectorStoreIndex.from_documents(
-        [],
-        storage_context=storage_context
+        documents,
+        storage_context=storage_context,
+        show_progress=False
     )
-    
-    # Extremely memory-safe iterative processing
-    parser = SentenceSplitter(chunk_size=256, chunk_overlap=20)
-    for doc in documents:
-        nodes = parser.get_nodes_from_documents([doc])
-        # Process 1 node at a time to keep RAM flat under 512MB
-        for node in nodes:
-            index.insert_nodes([node])
-            gc.collect()
+
+    import gc
+    gc.collect()
 
     query_engine = index.as_query_engine(
         similarity_top_k=5, 

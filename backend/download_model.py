@@ -1,7 +1,7 @@
 def main():
     print("Downloading FastEmbed model during build...")
     from fastembed import TextEmbedding
-    model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_dir="./model_cache")
+    model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2", cache_dir="./model_cache")
     print("Model downloaded successfully!")
 
 if __name__ == "__main__":
