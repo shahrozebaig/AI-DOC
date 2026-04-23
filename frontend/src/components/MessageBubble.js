@@ -24,7 +24,7 @@ function MessageBubble({ message, isUser, isError }) {
       {/* MESSAGE TEXT */}
       <div className={`flex flex-col max-w-[85%] md:max-w-[70%] space-y-1.5 ${isUser ? "items-end" : "items-start"}`}>
         <div
-          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 ${isUser
+          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 whitespace-pre-wrap ${isUser
               ? "bg-white text-black font-medium rounded-tr-none"
               : isError
                 ? "bg-red-950/20 text-red-200 border border-red-500/20 rounded-tl-none font-medium"
