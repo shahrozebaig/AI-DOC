@@ -46,3 +46,6 @@ huggingface/
 # Temporary files
 *.tmp
 *.bak
+
+# FastEmbed Model Cache
+model_cache/
