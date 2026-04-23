@@ -13,8 +13,13 @@ function FileUpload({ isCollapsed }) {
     setFileCount(fileList.length);
     setLoading(true);
     try {
-      await uploadFiles(fileList);
-      showToast(`${fileList.length} document(s) successfully processed and indexed.`, "success");
+      const res = await uploadFiles(fileList);
+      if (res && res.error) {
+        showToast(res.message || "Intelligence processing failed. Please retry upload.", "error");
+        setFileCount(0);
+      } else {
+        showToast(`${fileList.length} document(s) successfully processed and indexed.`, "success");
+      }
     } catch (err) {
       showToast("Intelligence processing failed. Please retry upload.", "error");
       setFileCount(0);

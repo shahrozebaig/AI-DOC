@@ -24,9 +24,9 @@ def create_index(documents):
     import gc
     from llama_index.core.node_parser import SentenceSplitter
     
-    # Initialize empty index
-    index = VectorStoreIndex.from_vector_store(
-        vector_store,
+    # Initialize empty index safely
+    index = VectorStoreIndex.from_documents(
+        [],
         storage_context=storage_context
     )
     
