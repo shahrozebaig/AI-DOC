@@ -1,17 +1,15 @@
 import { useState, useContext, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { AuthContext } from "../context/AuthContext";
-import { supabase } from "../lib/supabaseClient";
-import { signOut } from "../services/auth";
-import FaceAuthModal from "../components/FaceAuthModal";
-import { useToast } from "../context/ToastContext";
-import {
-  ScanFace,
-  Lock,
-  ShieldCheck,
-  User,
-  Trash2,
+  import { AuthContext } from "../context/AuthContext";
+  import { supabase } from "../lib/supabaseClient";
+  import { signOut } from "../services/auth";
+  import { useToast } from "../context/ToastContext";
+  import {
+    Lock,
+    ShieldCheck,
+    User,
+    Trash2,
   ChevronRight,
   LogOut,
   ArrowLeft
@@ -37,10 +35,6 @@ function Settings() {
   const [mfaVerifyCode, setMfaVerifyCode] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
   const [stepUpAction, setStepUpAction] = useState(null);
-  const [faceIdEnabled, setFaceIdEnabled] = useState(false);
-  const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
-  const [showFaceDisableConfirm, setShowFaceDisableConfirm] = useState(false);
-  const [faceDisablePassword, setFaceDisablePassword] = useState("");
   const checkMFA = useCallback(async () => {
     if (!user) return;
     try {
@@ -58,12 +52,7 @@ function Settings() {
         setMfaEnabled(false);
         setMfaUnenrollFactorId("");
       }
-      const { data: faceData } = await supabase
-        .from("face_auth")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      setFaceIdEnabled(!!faceData);
+
     } catch (err) {
       console.error("MFA check failed", err);
     }
@@ -119,28 +108,7 @@ function Settings() {
       }, 2000);
     }
   };
-  const disableFaceId = async () => {
-    if (!faceDisablePassword) return;
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: faceDisablePassword,
-    });
-    if (loginError) {
-      return showToast("Incorrect password.");
-    }
-    const { error } = await supabase
-      .from("face_auth")
-      .delete()
-      .eq("user_id", user.id);
-    if (error) {
-      showToast(String(error.message));
-    } else {
-      setFaceIdEnabled(false);
-      setShowFaceDisableConfirm(false);
-      setFaceDisablePassword("");
-      showToast("Face ID removed.", "success");
-    }
-  };
+
   const startMfaSetup = async () => {
     if (!mfaPassword) return showToast("Password is required");
     const { error: loginError } = await supabase.auth.signInWithPassword({
@@ -474,59 +442,6 @@ function Settings() {
                   </button>
                 </section>
 
-                {/* Biometric Section */}
-                <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <ScanFace size={22} className="text-emerald-500" />
-                      <div>
-                        <h3 className="text-lg font-bold text-white">Face ID Authentication</h3>
-                        <p className="text-xs text-gray-500">Secure biometric login with high precision.</p>
-                      </div>
-                    </div>
-                    {faceIdEnabled ? (
-                      <button
-                        onClick={() => setShowFaceDisableConfirm(true)}
-                        className="px-4 py-2 bg-red-500/10 text-red-500 text-xs font-bold rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all"
-                      >
-                        Disable
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setIsFaceModalOpen(true)}
-                        className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-xs font-bold rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all"
-                      >
-                        Enable Face ID
-                      </button>
-                    )}
-                  </div>
-
-                  {showFaceDisableConfirm && (
-                    <div className="p-6 bg-black/40 rounded-2xl border border-red-500/20 mt-4 space-y-4 animate-in zoom-in-95 duration-200">
-                      <p className="text-xs text-red-400">Please enter your password to disable Face ID authentication.</p>
-                      <div className="flex gap-2">
-                        <input
-                          type="password"
-                          className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:border-red-500"
-                          placeholder="Enter password"
-                          onChange={(e) => setFaceDisablePassword(e.target.value)}
-                        />
-                        <button
-                          onClick={disableFaceId}
-                          className="px-4 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-500 transition-all"
-                        >
-                          Confirm
-                        </button>
-                        <button
-                          onClick={() => setShowFaceDisableConfirm(false)}
-                          className="px-4 bg-white/5 text-gray-400 rounded-xl text-xs font-bold hover:bg-white/10 transition-all"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </section>
 
                 {/* 2FA Section */}
                 <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
@@ -723,19 +638,6 @@ function Settings() {
         )}
       </AnimatePresence>
 
-      {/* Face ID Modal */}
-      <FaceAuthModal
-        isOpen={isFaceModalOpen}
-        onClose={() => setIsFaceModalOpen(false)}
-        mode="register"
-        userEmail={user?.email}
-        userId={user?.id}
-        onSuccess={() => {
-          setFaceIdEnabled(true);
-          setIsFaceModalOpen(false);
-          showToast("Face ID enabled successfully!", "success");
-        }}
-      />
 
       <style>{`
         .animate-in {

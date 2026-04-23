@@ -12,6 +12,7 @@ def init_models():
     Settings.embed_model = get_embed_model()
     Settings.chunk_size = 512
     Settings.chunk_overlap = 50
+    Settings.embed_batch_size = 2
 def create_index(documents):
     global index, query_engine
     init_models()
@@ -19,6 +20,8 @@ def create_index(documents):
     faiss_index = faiss.IndexFlatL2(dimension)
     vector_store = FaissVectorStore(faiss_index=faiss_index)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
+    import gc
+    gc.collect()
     index = VectorStoreIndex.from_documents(
         documents,
         storage_context=storage_context

@@ -3,18 +3,17 @@ uvicorn
 python-dotenv
 llama-index
 llama-index-llms-groq
-llama-index-embeddings-fastembed
-fastembed
+llama-index-embeddings-huggingface
 llama-index-vector-stores-faiss
 faiss-cpu
 supabase
-
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+transformers
+sentence-transformers
 numpy==1.26.4
 tabulate
-dlib-bin
-face_recognition_models
 Click>=6.0
 Pillow
-opencv-python-headless<4.10.0.0
 python-multipart
 setuptools<81

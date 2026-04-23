@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import AuthLayout from "../components/AuthLayout";
 import AuthBackground from "../components/AuthBackground";
-import { ScanFace } from "lucide-react";
+
 import {
   signIn,
   signInWithGoogle,
@@ -11,7 +11,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../lib/supabaseClient";
-import FaceAuthModal from "../components/FaceAuthModal";
 import { useToast } from "../context/ToastContext";
 
 function Login() {
@@ -25,7 +24,6 @@ function Login() {
   const [mfaCode, setMfaCode] = useState("");
   const [mfaError, setMfaError] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState("");
-  const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
@@ -254,27 +252,6 @@ function Login() {
                   </button>
                 </div>
 
-                <div className="mb-6">
-                  <button
-                    onClick={() => {
-                      if (!email) {
-                        showToast("Please enter your email address first to use Face ID login.");
-                        return;
-                      }
-                      setIsFaceModalOpen(true);
-                    }}
-                    className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-[0.98]"
-                  >
-                    <ScanFace size={22} className="shrink-0" />
-                    Sign in with Face ID
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex-1 h-[1px] bg-gray-200" />
-                  <span className="text-xs text-gray-400 font-medium tracking-wide uppercase">or continue with email</span>
-                  <div className="flex-1 h-[1px] bg-gray-200" />
-                </div>
 
                 <div className="space-y-5">
                   {/* Email */}
@@ -340,19 +317,7 @@ function Login() {
         </div>
       </AuthLayout>
 
-      <FaceAuthModal
-        isOpen={isFaceModalOpen}
-        onClose={() => setIsFaceModalOpen(false)}
-        mode="login"
-        userEmail={email}
-        onSuccess={(data) => {
-          if (data.action_link) {
-            window.location.href = data.action_link;
-          } else if (data.verified) {
-            showToast("Face verified! Logging you in...", "success");
-          }
-        }}
-      />
+
     </div>
   );
 }
