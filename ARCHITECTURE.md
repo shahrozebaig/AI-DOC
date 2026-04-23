@@ -97,6 +97,28 @@ graph TD
 
 The core intelligence of DocuMind AI follows a strict 2-phase pipeline to ensure fast retrieval while keeping memory usage extremely low.
 
+```mermaid
+graph TD
+    %% Phase A: Ingestion
+    A_Start[Phase A: Ingestion] --> A1[Upload PDF]
+    A1 --> A2[Secure User Folder]
+    A2 --> A3[Chunking - 512 chars]
+    A3 --> A4[FastEmbed - MiniLM]
+    A4 --> A5[FAISS Vector Store]
+
+    %% Phase B: Chatting
+    B_Start[Phase B: Chatting] --> B1[User Question]
+    B1 --> B2[Question Embedding]
+    B2 --> B3[FAISS Similarity Search]
+    B3 --> B4[Context Retrieval]
+    B4 --> B5[Groq Llama 3 API]
+    B5 --> B6[AI Response]
+
+    %% Styles
+    style A_Start fill:#f96,stroke:#333,stroke-width:4px
+    style B_Start fill:#69f,stroke:#333,stroke-width:4px
+```
+
 ### Phase A: Document Ingestion 
 This occurs when a user uploads a PDF.
 
