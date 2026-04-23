@@ -45,7 +45,7 @@ def chat(req: ChatRequest):
             session_id = session_response.data[0]["id"]
             print(f"DEBUG: Created session {session_id}")
         print("DEBUG: Getting chat engine...")
-        engine = get_chat_engine()
+        engine = get_chat_engine(req.user_id)
         print("DEBUG: Saving user message...")
         supabase.table("chat_messages").insert({
             "session_id": session_id,

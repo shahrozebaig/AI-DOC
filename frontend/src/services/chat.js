@@ -24,8 +24,9 @@ export const deleteChatSession = async (sessionId) => {
   return res.data;
 };
 
-export const uploadFiles = async (files) => {
+export const uploadFiles = async (files, userId) => {
   const formData = new FormData();
+  formData.append("user_id", userId);
   files.forEach((file) => {
     formData.append("files", file);
   });

@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { uploadFiles } from "../services/chat";
 import { useToast } from "../context/ToastContext";
+import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
 import { Upload, FileCheck, Loader2 } from "lucide-react";
 function FileUpload({ isCollapsed }) {
   const { showToast } = useToast();
+  const { user } = useContext(AuthContext);
   const [fileCount, setFileCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -13,7 +16,7 @@ function FileUpload({ isCollapsed }) {
     setFileCount(fileList.length);
     setLoading(true);
     try {
-      const res = await uploadFiles(fileList);
+      const res = await uploadFiles(fileList, user.id);
       if (res && res.error) {
         showToast(res.message || "Intelligence processing failed. Please retry upload.", "error");
         setFileCount(0);

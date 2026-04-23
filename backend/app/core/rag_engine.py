@@ -3,8 +3,8 @@ from llama_index.core.storage.storage_context import StorageContext
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.core.memory import ChatMemoryBuffer
 import faiss
-index = None
-query_engine = None
+user_indices = {}
+user_query_engines = {}
 def init_models():
     from app.core.llm import get_llm
     from app.core.embeddings import get_embed_model
@@ -13,8 +13,8 @@ def init_models():
     Settings.chunk_size = 512
     Settings.chunk_overlap = 50
     Settings.embed_batch_size = 2
-def create_index(documents):
-    global index, query_engine
+def create_index(documents, user_id: str):
+    global user_indices, user_query_engines
     init_models()
     dimension = 384
     faiss_index = faiss.IndexFlatL2(dimension)
@@ -31,19 +31,21 @@ def create_index(documents):
     import gc
     gc.collect()
 
-    query_engine = index.as_query_engine(
+    user_indices[user_id] = index
+    user_query_engines[user_id] = index.as_query_engine(
         similarity_top_k=5, 
         response_mode="compact" 
     )
-def get_query_engine():
-    global query_engine
-    if query_engine is None:
+
+def get_query_engine(user_id: str):
+    if user_id not in user_query_engines:
         raise Exception("No documents indexed yet. Upload a file first.")
-    return query_engine
-def get_chat_engine(history=None):
-    global index
-    if index is None:
+    return user_query_engines[user_id]
+
+def get_chat_engine(user_id: str, history=None):
+    if user_id not in user_indices:
         raise Exception("No documents indexed yet. Upload a file first.")
+    index = user_indices[user_id]
     memory = ChatMemoryBuffer.from_defaults(token_limit=1500)
     return index.as_chat_engine(
         chat_mode="context",
