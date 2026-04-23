@@ -1,7 +1,7 @@
 def main():
-    print("Downloading HuggingFace model during build...")
-    from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-    model = HuggingFaceEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    print("Downloading FastEmbed model during build...")
+    from fastembed import TextEmbedding
+    model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_dir="./model_cache")
     print("Model downloaded successfully!")
 
 if __name__ == "__main__":
