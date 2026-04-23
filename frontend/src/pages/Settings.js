@@ -252,7 +252,8 @@ function Settings() {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/user/delete-account/", {
+      const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:8000";
+      const res = await fetch(`${baseUrl}/user/delete-account/`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id }),
@@ -297,7 +298,8 @@ function Settings() {
         await supabase.auth.updateUser({ password: newPassword });
         showToast("Password updated", "success");
       } else if (stepUpAction === "account deletion") {
-        const res = await fetch("http://localhost:8000/user/delete-account/", {
+        const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:8000";
+        const res = await fetch(`${baseUrl}/user/delete-account/`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id: user.id }),

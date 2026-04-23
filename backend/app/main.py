@@ -22,3 +22,7 @@ app.include_router(upload_router, prefix="/upload")
 app.include_router(health_router, prefix="/health")
 app.include_router(user_router, prefix="/user")
 app.include_router(face_router, prefix="/face")
+
+@app.get("/")
+async def root():
+    return {"message": "AI-DOC API is running successfully!"}
