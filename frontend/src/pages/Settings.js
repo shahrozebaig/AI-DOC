@@ -40,7 +40,7 @@ function Settings() {
   const [stepUpAction, setStepUpAction] = useState(null);
   const [showClearChatsConfirm, setShowClearChatsConfirm] = useState(false);
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
+  const [clearingType, setClearingType] = useState(null);
   const checkMFA = useCallback(async () => {
     if (!user) return;
     try {
@@ -259,7 +259,7 @@ function Settings() {
   };
 
   const handleClearData = async (type) => {
-    setIsClearing(true);
+    setClearingType(type);
     try {
       const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:8000";
       const endpoint = type === 'chats' ? '/data/clear-chats/' : '/data/clear-all/';
@@ -281,7 +281,7 @@ function Settings() {
     } catch (err) {
       showToast(err.message || "Something went wrong");
     } finally {
-      setIsClearing(false);
+      setClearingType(null);
     }
   };
 
@@ -602,7 +602,7 @@ function Settings() {
                       <p className="text-sm text-gray-500">Wipe all your chat sessions and messages. Your documents will remain indexed.</p>
                     </div>
                     <button
-                      disabled={isClearing}
+                      disabled={clearingType !== null}
                       onClick={() => setShowClearChatsConfirm(true)}
                       className="shrink-0 bg-white/5 border border-white/10 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-white/10 transition-all active:scale-95 disabled:opacity-50"
                     >
@@ -616,10 +616,10 @@ function Settings() {
                       <div className="flex gap-3">
                         <button
                           onClick={() => handleClearData('chats')}
-                          disabled={isClearing}
+                          disabled={clearingType !== null}
                           className="flex-1 bg-red-600 text-white text-xs font-bold py-2 rounded-lg hover:bg-red-500 transition-all"
                         >
-                          {isClearing ? "Clearing..." : "Yes, Clear Chats"}
+                          {clearingType === 'chats' ? "Clearing..." : "Yes, Clear Chats"}
                         </button>
                         <button
                           onClick={() => setShowClearChatsConfirm(false)}
@@ -640,7 +640,7 @@ function Settings() {
                       <p className="text-sm text-gray-500">Wipe EVERYTHING: chat history and all document embeddings. You will need to re-upload files to chat again.</p>
                     </div>
                     <button
-                      disabled={isClearing}
+                      disabled={clearingType !== null}
                       onClick={() => setShowClearAllConfirm(true)}
                       className="shrink-0 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-all active:scale-95 disabled:opacity-50"
                     >
@@ -654,10 +654,10 @@ function Settings() {
                       <div className="flex gap-3">
                         <button
                           onClick={() => handleClearData('all')}
-                          disabled={isClearing}
+                          disabled={clearingType !== null}
                           className="flex-1 bg-red-600 text-white text-xs font-bold py-2 rounded-lg hover:bg-red-500 transition-all"
                         >
-                          {isClearing ? "Wiping..." : "Yes, Wipe Everything"}
+                          {clearingType === 'all' ? "Wiping..." : "Yes, Wipe Everything"}
                         </button>
                         <button
                           onClick={() => setShowClearAllConfirm(false)}
