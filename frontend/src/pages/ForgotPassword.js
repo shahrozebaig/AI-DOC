@@ -4,7 +4,6 @@ import { supabase } from "../lib/supabaseClient";
 import { useToast } from "../context/ToastContext";
 import AuthLayout from "../components/AuthLayout";
 import { Mail, ArrowLeft, KeyRound, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");

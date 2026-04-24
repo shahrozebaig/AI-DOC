@@ -11,14 +11,19 @@ import {
   Settings as SettingsIcon,
   ChevronLeft,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  HelpCircle,
+  X
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
 function Dashboard() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [currentSessionId] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const loadSessions = useCallback(async () => {
     if (!user) return;
@@ -91,6 +96,13 @@ function Dashboard() {
         <div className="p-3 border-t border-white/5 space-y-1">
           <div className={`flex flex-col gap-1 ${collapsed ? "items-center" : ""}`}>
             <button
+              onClick={() => setShowHelp(true)}
+              className="w-full flex items-center gap-3 py-3 px-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+            >
+              <HelpCircle size={18} />
+              {!collapsed && <span className="text-xs font-medium">Help & Info</span>}
+            </button>
+            <button
               onClick={() => navigate("/settings")}
               className="w-full flex items-center gap-3 py-3 px-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-all"
             >
@@ -142,7 +154,77 @@ function Dashboard() {
           </div>
         </section>
 
-        <style>{`
+      {/* HELP MODAL */}
+      <AnimatePresence>
+        {showHelp && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-[#111111] border border-white/10 w-full max-w-lg rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
+              
+              <button 
+                onClick={() => setShowHelp(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full text-gray-500 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                  <HelpCircle size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">System Optimization</h2>
+                  <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Performance Guide</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  If you encounter <span className="text-white font-semibold">"Intelligence processing failed,"</span> it is because parsing or indexing heavy/larger documents can sometimes exceed the <span className="text-white font-semibold">Render Free Tier</span> limit (512MB RAM). Please refresh and retry your upload.
+                </p>
+
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Technical Evolution:</h3>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <p className="text-sm text-gray-400">
+                      <span className="text-gray-200 font-medium">Model Swap (HuggingFace → FastEmbed):</span> We swapped heavy Hugging Face PyTorch models for <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This reduced the model size from 400MB+ to just ~90MB to fit in Render's 512MB limit.
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <p className="text-sm text-gray-400">
+                      <span className="text-gray-200 font-medium">LLM Reasoning (Local → Groq):</span> Instead of running Llama 3 on the server (which needs 4GB+ RAM), we use the <span className="text-white font-mono text-xs">Groq Llama 3.1 API</span>. This offloads 100% of the heavy math to the cloud for instant responses.
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <p className="text-sm text-gray-400">
+                      <span className="text-gray-200 font-medium">Engine Optimization:</span> We moved from standard Python processing to <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This ensures that indexing your documents uses the minimum possible RAM while staying fast.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                  <p className="text-xs text-gray-500 leading-relaxed italic">
+                    💡 Pro Tip: If you encounter an error during upload, please <span className="text-gray-300 font-bold underline">refresh the page</span> and try again. For the best experience on free hosting, try uploading multiple smaller files instead of one massive document.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <style>{`
             .custom-scrollbar::-webkit-scrollbar {
                 width: 4px;
             }

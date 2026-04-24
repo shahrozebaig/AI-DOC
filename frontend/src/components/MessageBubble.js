@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { User, Sparkles, AlertCircle } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 function MessageBubble({ message, isUser, isError }) {
   return (
     <motion.div
@@ -22,16 +25,22 @@ function MessageBubble({ message, isUser, isError }) {
         </div>
       </div>
       {/* MESSAGE TEXT */}
-      <div className={`flex flex-col max-w-[85%] md:max-w-[70%] space-y-1.5 ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`flex flex-col max-w-[85%] md:max-w-[85%] space-y-1.5 ${isUser ? "items-end" : "items-start"}`}>
         <div
-          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 whitespace-pre-wrap ${isUser
+          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 ${isUser
               ? "bg-white text-black font-medium rounded-tr-none"
               : isError
                 ? "bg-red-950/20 text-red-200 border border-red-500/20 rounded-tl-none font-medium"
                 : "bg-white/5 border border-white/[0.05] text-gray-200 rounded-tl-none hover:bg-white/[0.07]"
             }`}
         >
-          {message}
+          <div className="markdown-content">
+            {isUser ? (
+              <p className="whitespace-pre-wrap">{message}</p>
+            ) : (
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message}</ReactMarkdown>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

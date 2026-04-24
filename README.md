@@ -38,6 +38,21 @@ Below is the visual overview of how **DocuMind AI** processes documents, manages
 
 ---
 
+## 💡 Troubleshooting & Performance Tips
+
+To get the most out of **DocuMind AI** on the Render free tier (512MB RAM), please refer to the table below for handling common scenarios:
+
+| Issue / Scenario | Recommended Action | Reason / Insight |
+| :--- | :--- | :--- |
+| **"Intelligence processing failed"** | **Refresh the page** and retry the upload. | The system hit a temporary RAM limit; refreshing resets the session state. |
+| **Large Documents (10MB+)** | Split into smaller files (under 50 pages each). | Smaller chunks index much more reliably on low-resource hardware. |
+| **Site feels slow at first** | Wait 10-15 seconds for the initial load. | Render is "waking up" the server from its "sleep" state. |
+| **Long Indexing Spinner** | Stay on the page until it completes. | Deep parsing of complex PDFs takes time to ensure high retrieval accuracy. |
+
+---
+
+---
+
 ## Tech Stack
 
 | Layer        | Technology Used                                 |

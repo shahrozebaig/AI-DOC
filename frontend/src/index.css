@@ -33,3 +33,57 @@ body {
   background-clip: text;
   color: transparent;
 }
+
+/* MARKDOWN TABLE STYLES */
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.markdown-content th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.markdown-content td {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.markdown-content tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-content p {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
