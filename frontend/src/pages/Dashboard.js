@@ -91,7 +91,7 @@ function Dashboard() {
 
 
         {/* Action Area - File Upload (No header) */}
-        <div className={`p-6 pb-0 ${collapsed ? "px-2" : ""}`}>
+        <div className={`p-4 ${collapsed ? "px-2" : ""}`}>
            <div className={`bg-white/5 border border-white/10 transition-all group cursor-pointer shadow-lg ${collapsed ? "rounded-xl p-3" : "rounded-2xl p-4 hover:border-emerald-500/30"
               }`}>
               <FileUpload isCollapsed={collapsed} />
@@ -104,9 +104,9 @@ function Dashboard() {
         </div>
 
         {/* Action Header - Recent Chats */}
-        <div className={`flex flex-col flex-1 ${collapsed ? "items-center px-2" : "p-6 pt-8"} gap-6 overflow-hidden`}>
+        <div className={`flex flex-col flex-1 ${collapsed ? "items-center px-2" : "p-4 pt-6"} gap-6 overflow-hidden`}>
           {/* CHAT SESSIONS LIST */}
-          <div className="flex-1 flex flex-col min-h-0 w-full mt-4">
+          <div className="flex-1 flex flex-col min-h-0 w-full mt-2">
             {!collapsed && (
               <div className="flex items-center justify-between mb-4 px-2">
                 <h3 className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Recent Chats</h3>
@@ -157,7 +157,7 @@ function Dashboard() {
         </div>
 
         {/* BOTTOM SECTION - FIXED SETTINGS */}
-        <div className={`p-4 mt-auto border-t border-white/5`}>
+        <div className={`p-2 px-4 pb-6 mt-auto border-t border-white/5`}>
           <button
             onClick={() => navigate("/settings")}
             className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-white/5 text-gray-400 hover:text-white group`}

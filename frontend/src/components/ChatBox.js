@@ -6,7 +6,6 @@ import { AuthContext } from "../context/AuthContext";
 import {
   Send,
   Mic,
-  CornerDownLeft,
   Sparkles,
   RefreshCw
 } from "lucide-react";
@@ -143,53 +142,42 @@ function ChatBox({ sessionId, onSessionCreated }) {
         </div>
       </div>
       {/* INPUT AREA */}
-      <div className="p-6 pt-2 w-full">
-        <div className="relative group transition-all duration-300">
-          {/* Background Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-[28px] blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-          <div className="relative bg-[#111111] border border-white/10 rounded-[24px] shadow-2xl focus-within:border-white/20 transition-all">
-            <div className="flex items-end gap-2 px-6 py-2">
-              {/* Text Field */}
-              <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={isListening ? "Listening..." : "Message AI Assistant..."}
-                rows={1}
-                className="flex-1 max-h-[200px] bg-transparent py-4 text-sm text-gray-200 outline-none placeholder-gray-600 resize-none leading-relaxed hide-scrollbar"
-              />
-              <div className="flex items-center gap-1 mb-1">
-                {/* Voice Tool */}
-                <button
-                  onClick={toggleListening}
-                  className={`p-3 rounded-xl transition-all ${isListening
-                      ? "bg-red-500/20 text-red-500 animate-pulse"
-                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
-                    }`}
-                >
-                  <Mic size={20} />
-                </button>
-                {/* Send Tool */}
-                <button
-                  onClick={handleSend}
-                  disabled={loading || !message.trim()}
-                  className={`p-3 rounded-xl transition-all ${!message.trim() || loading
-                      ? "text-gray-700 cursor-not-allowed"
-                      : "bg-white text-black hover:scale-105 active:scale-95 shadow-xl shadow-white/10"
-                    }`}
-                >
-                  <Send size={20} />
-                </button>
-              </div>
-            </div>
-            {/* Status bar */}
-            <div className="flex items-center justify-end px-6 py-2 border-t border-white/[0.03] text-[9px] uppercase font-bold tracking-[0.2em] text-gray-600">
-              <div className="flex items-center gap-1">
-                <CornerDownLeft size={10} />
-                <span>Enter to Send</span>
-              </div>
-            </div>
+      <div className="p-4 md:p-6 w-full max-w-4xl mx-auto mb-4">
+        <div className="relative flex items-center bg-[#1e1e1e] border border-white/10 rounded-[32px] px-4 py-2 shadow-2xl focus-within:border-white/20 transition-all">
+          {/* Text Field */}
+          <textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Message AI Assistant..."
+            rows={1}
+            className="flex-1 bg-transparent px-3 py-3 text-sm text-gray-200 outline-none placeholder-gray-500 resize-none leading-relaxed hide-scrollbar"
+            style={{ minHeight: '44px' }}
+          />
+
+          <div className="flex items-center gap-1">
+            {/* Voice Tool */}
+            <button
+              onClick={toggleListening}
+              className={`p-2 rounded-full transition-all ${isListening
+                  ? "text-red-500 animate-pulse"
+                  : "text-gray-500 hover:text-white"
+                }`}
+            >
+              <Mic size={20} />
+            </button>
+            {/* Send Tool */}
+            <button
+              onClick={handleSend}
+              disabled={loading || !message.trim()}
+              className={`p-2 rounded-full transition-all ${!message.trim() || loading
+                  ? "text-gray-700 cursor-not-allowed"
+                  : "text-white bg-emerald-600 hover:bg-emerald-500"
+                }`}
+            >
+              <Send size={18} />
+            </button>
           </div>
         </div>
       </div>
