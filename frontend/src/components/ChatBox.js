@@ -89,7 +89,7 @@ function ChatBox({ sessionId, onSessionCreated }) {
     try {
       const res = await sendMessage(currentMsg, user.id, sessionId);
       if (!sessionId && res.session_id) {
-        onSessionCreated();
+        onSessionCreated(res.session_id);
       }
       setChat(prev => [...prev, { text: res.response, isUser: false }]);
     } catch (err) {
@@ -114,11 +114,11 @@ function ChatBox({ sessionId, onSessionCreated }) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat, loading]);
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto">
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto relative">
       {/* MESSAGES AREA */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-10 custom-scrollbar scroll-smooth">
+      <div className="flex-1 overflow-y-auto px-4 py-8 scroll-smooth hide-scrollbar z-10">
         {chat.length === 0 && !loading && (
-          <div className="h-full flex flex-col items-center justify-start pt-[15vh] text-center space-y-6 opacity-30 animate-in fade-in duration-1000">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-6 opacity-30 pointer-events-none">
             <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center border border-white/5">
               <Sparkles size={40} className="text-emerald-500" />
             </div>
@@ -127,21 +127,23 @@ function ChatBox({ sessionId, onSessionCreated }) {
             </div>
           </div>
         )}
-        {chat.map((msg, i) => (
-          <MessageBubble key={i} message={msg.text} isUser={msg.isUser} isError={msg.isError} />
-        ))}
-        {loading && (
-          <div className="flex justify-start items-center gap-3 animate-in fade-in duration-500">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-500 border border-white/5 shadow-lg">
-              <RefreshCw size={14} className="animate-spin" />
+        <div className="min-h-full flex flex-col gap-10 pb-20">
+            {chat.map((msg, i) => (
+            <MessageBubble key={i} message={msg.text} isUser={msg.isUser} isError={msg.isError} />
+            ))}
+            {loading && (
+            <div className="flex justify-start items-center gap-3 mt-10">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-500 border border-white/5 shadow-lg">
+                <RefreshCw size={14} className="animate-spin" />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">Processing...</p>
             </div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">Processing...</p>
-          </div>
-        )}
-        <div ref={chatEndRef} />
+            )}
+            <div ref={chatEndRef} className="h-10" />
+        </div>
       </div>
       {/* INPUT AREA */}
-      <div className="p-6 pt-2">
+      <div className="p-6 pt-2 w-full">
         <div className="relative group transition-all duration-300">
           {/* Background Glow Effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-[28px] blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-hover:duration-200"></div>
@@ -155,7 +157,7 @@ function ChatBox({ sessionId, onSessionCreated }) {
                 onKeyDown={handleKeyDown}
                 placeholder={isListening ? "Listening..." : "Message AI Assistant..."}
                 rows={1}
-                className="flex-1 max-h-[200px] bg-transparent py-4 text-sm text-gray-200 outline-none placeholder-gray-600 resize-none leading-relaxed custom-scrollbar"
+                className="flex-1 max-h-[200px] bg-transparent py-4 text-sm text-gray-200 outline-none placeholder-gray-600 resize-none leading-relaxed hide-scrollbar"
               />
               <div className="flex items-center gap-1 mb-1">
                 {/* Voice Tool */}
@@ -192,14 +194,15 @@ function ChatBox({ sessionId, onSessionCreated }) {
         </div>
       </div>
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 10px;
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
+
     </div>
   );
 }

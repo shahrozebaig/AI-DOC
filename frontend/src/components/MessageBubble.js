@@ -27,22 +27,26 @@ function MessageBubble({ message, isUser, isError }) {
       {/* MESSAGE TEXT */}
       <div className={`flex flex-col w-full md:max-w-[85%] space-y-1.5 ${isUser ? "items-end max-w-[85%]" : "items-start max-w-full md:max-w-[85%]"}`}>
         <div
-          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 overflow-hidden ${isUser
+          className={`px-7 py-5 rounded-[22px] text-[14.5px] leading-[1.65] shadow-sm transition-all duration-300 overflow-hidden ${isUser
               ? "bg-white text-black font-medium rounded-tr-none"
               : isError
                 ? "bg-red-950/20 text-red-200 border border-red-500/20 rounded-tl-none font-medium"
-                : "bg-white/5 border border-white/[0.05] text-gray-200 rounded-tl-none hover:bg-white/[0.07]"
+                : "bg-[#111111] border border-white/5 text-gray-200 rounded-tl-none hover:bg-white/[0.07]"
             }`}
         >
-          <div className="markdown-content">
+          <div className="markdown-content space-y-4">
             {isUser ? (
               <p className="whitespace-pre-wrap">{message}</p>
             ) : (
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
+                  p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
+                  ul: ({node, ...props}) => <ul {...props} className="list-disc ml-6 mb-4 space-y-2" />,
+                  ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-6 mb-4 space-y-2" />,
+                  li: ({node, ...props}) => <li {...props} className="text-gray-300" />,
                   table: ({node, ...props}) => (
-                    <div className="block w-full overflow-x-auto custom-scrollbar my-4 rounded-xl border border-white/5 bg-white/[0.02] shadow-inner" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}>
+                    <div className="block w-full overflow-x-auto hide-scrollbar my-6 rounded-xl border border-white/10 bg-white/[0.02]" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}>
                       <table {...props} className="min-w-[500px] w-full border-collapse divide-y divide-white/5" />
                     </div>
                   ),

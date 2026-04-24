@@ -24,8 +24,18 @@ function Dashboard() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [sessions, setSessions] = useState([]);
-  const [currentSessionId] = useState(null);
+  const [currentSessionId, setCurrentSessionId] = useState(() => {
+    return localStorage.getItem("currentSessionId") || null;
+  });
   const [showHelp, setShowHelp] = useState(false);
+
+  useEffect(() => {
+    if (currentSessionId) {
+      localStorage.setItem("currentSessionId", currentSessionId);
+    } else {
+      localStorage.removeItem("currentSessionId");
+    }
+  }, [currentSessionId]);
 
   const loadSessions = useCallback(async () => {
     if (!user) return;
@@ -70,7 +80,7 @@ function Dashboard() {
 
 
         {/* Action Header - NOW UPLOAD (Centered) */}
-        <div className={`flex-1 flex flex-col justify-center ${collapsed ? "items-center px-2" : "p-6"}`}>
+        <div className={`flex flex-col ${collapsed ? "items-center px-2" : "p-6"} gap-6 overflow-hidden`}>
           <div className="space-y-4 w-full">
             {!collapsed && (
               <div className="flex flex-col items-center gap-2 mb-2 animate-in fade-in duration-500">
@@ -86,9 +96,48 @@ function Dashboard() {
 
             {!collapsed && (
               <p className="text-[10px] text-gray-600 text-center px-4 leading-relaxed tracking-wider italic animate-in fade-in duration-500">
-                All analyzed data remains locally indexed for this session.
+                Data survives session restarts.
               </p>
             )}
+          </div>
+
+          {/* CHAT SESSIONS LIST */}
+          <div className="flex-1 flex flex-col min-h-0 w-full">
+            {!collapsed && (
+              <div className="flex items-center justify-between mb-4 px-2">
+                <h3 className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Recent Chats</h3>
+                <button 
+                  onClick={() => setCurrentSessionId(null)}
+                  className="p-1.5 hover:bg-white/5 rounded-lg text-emerald-500 transition-colors"
+                  title="New Chat"
+                >
+                  <MessageSquare size={14} />
+                </button>
+              </div>
+            )}
+            
+            <div className="flex-1 overflow-y-auto space-y-1 hide-scrollbar pr-1">
+              {sessions.map((session) => (
+                <button
+                  key={session.id}
+                  onClick={() => setCurrentSessionId(session.id)}
+                  className={`w-full text-left p-3 rounded-xl transition-all group relative border ${
+                    currentSessionId === session.id 
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-white" 
+                      : "border-transparent hover:bg-white/5 text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageSquare size={14} className={currentSessionId === session.id ? "text-emerald-500" : "text-gray-600"} />
+                    {!collapsed && (
+                      <span className="text-xs font-medium truncate flex-1">
+                        {session.title || "Untitled Chat"}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -172,19 +221,22 @@ function Dashboard() {
         {/* CHAT INTERFACE */}
         <section className="flex-1 relative flex flex-col h-full w-full min-w-0 overflow-hidden">
           <div className="flex-1 overflow-hidden z-10 h-full w-full">
-            <ChatBox sessionId={currentSessionId} onSessionCreated={loadSessions} />
+            <ChatBox sessionId={currentSessionId} onSessionCreated={(newId) => {
+              loadSessions();
+              if (newId) setCurrentSessionId(newId);
+            }} />
           </div>
         </section>
 
         {/* HELP MODAL */}
         <AnimatePresence>
           {showHelp && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="bg-[#111111] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
+                className="bg-[#111111] border border-white/10 w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-3xl p-6 md:p-8 shadow-2xl relative hide-scrollbar"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
 
@@ -258,20 +310,15 @@ function Dashboard() {
           )}
         </AnimatePresence>
 
+
         <style>{`
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 4px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
+          .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
         `}</style>
       </main>
     </div>
