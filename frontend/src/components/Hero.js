@@ -3,7 +3,7 @@ import SplineBackground from "./SplineBackground";
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center text-center overflow-hidden bg-hero">
+    <section className="relative min-h-[100dvh] flex items-center justify-center text-center overflow-hidden bg-hero">
       
       {/* 3D Background */}
       <SplineBackground />
