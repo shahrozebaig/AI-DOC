@@ -28,7 +28,7 @@ function Navbar() {
   const hideLogo = isDashboard || isSettings;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] flex justify-between items-center px-6 md:px-10 py-5 bg-black/40 backdrop-blur-xl border-b border-white/[0.03]">
+    <nav className="fixed top-0 left-0 right-0 z-[100] flex justify-between items-center px-6 md:px-10 py-[10px] bg-black/40 backdrop-blur-xl border-b border-white/[0.03]">
       {/* LEFT: LOGO */}
       <div className="flex-1">
         {!hideLogo && (

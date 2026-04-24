@@ -1,6 +1,5 @@
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
@@ -13,8 +12,7 @@ import {
   ChevronRight,
   LogOut,
   ArrowLeft,
-  Database,
-  RotateCcw
+  Database
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 function Settings() {
@@ -63,6 +61,14 @@ function Settings() {
       console.error("MFA check failed", err);
     }
   }, [user]);
+
+  const menuItems = useMemo(() => [
+    { id: "profile", label: "Profile", icon: <User size={18} /> },
+    { id: "security", label: "Security", icon: <ShieldCheck size={18} /> },
+    { id: "data", label: "Clear AI Data", icon: <Database size={18} /> },
+    { id: "account", label: "Account", icon: <Trash2 size={18} /> },
+  ], []);
+
   useEffect(() => {
     checkMFA();
     const params = new URLSearchParams(window.location.search);
@@ -70,7 +76,7 @@ function Settings() {
     if (tab && menuItems.some(item => item.id === tab)) {
       setActiveTab(tab);
     }
-  }, [checkMFA]);
+  }, [checkMFA, menuItems]);
   const updateEmail = async () => {
     if (!email || !emailPassword) return showToast("All fields are required");
     const { error: loginError } = await supabase.auth.signInWithPassword({
@@ -335,16 +341,11 @@ function Settings() {
     }
   };
 
-  const menuItems = [
-    { id: "profile", label: "Profile", icon: <User size={18} /> },
-    { id: "security", label: "Security", icon: <ShieldCheck size={18} /> },
-    { id: "data", label: "Clear AI Data", icon: <Database size={18} /> },
-    { id: "account", label: "Account", icon: <Trash2 size={18} /> },
-  ];
+
 
   return (
-    <div className="min-h-screen bg-[#080808] text-gray-200 font-sans mt-20">
-      <Navbar />
+    <div className="min-h-screen bg-[#080808] text-gray-200 font-sans">
+
 
       <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-12">
 
@@ -353,11 +354,11 @@ function Settings() {
           <div className="flex items-center gap-3 mb-10">
             <button
               onClick={() => navigate("/dashboard")}
-              className="p-2 hover:bg-white/5 rounded-lg transition-colors border border-white/10"
+              className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-xl transition-all border border-white/10 text-gray-400 hover:text-white"
             >
               <ArrowLeft size={16} />
+              <span className="text-xs font-bold uppercase tracking-widest">Dashboard</span>
             </button>
-            <h1 className="text-xl font-bold text-white">Settings</h1>
           </div>
 
           <nav className="flex flex-col gap-1">

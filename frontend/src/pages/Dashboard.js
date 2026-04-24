@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import ChatBox from "../components/ChatBox";
 import FileUpload from "../components/FileUpload";
 import { AuthContext } from "../context/AuthContext";
@@ -14,8 +13,10 @@ import {
   MessageSquare,
   HelpCircle,
   X,
-  Eraser
+  Eraser,
+  LogOut
 } from "lucide-react";
+import { signOut } from "../services/auth";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Dashboard() {
@@ -42,7 +43,7 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen bg-[#080808] text-gray-200 overflow-hidden font-sans">
-      <Navbar />
+
 
       {/* MOBILE OVERLAY */}
       {!collapsed && (
@@ -54,7 +55,7 @@ function Dashboard() {
 
       {/* SIDEBAR */}
       <aside
-        className={`absolute md:relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-transform md:transition-all duration-300 ease-in-out mt-16 h-[calc(100vh-4rem)] z-40 ${collapsed ? "-translate-x-full md:translate-x-0 w-72 md:w-20" : "translate-x-0 w-80 md:w-72"
+        className={`absolute md:relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-transform md:transition-all duration-300 ease-in-out h-full z-40 ${collapsed ? "-translate-x-full md:translate-x-0 w-72 md:w-20" : "translate-x-0 w-80 md:w-72"
           }`}
       >
         {/* Toggle Button */}
@@ -115,6 +116,13 @@ function Dashboard() {
               <SettingsIcon size={18} />
               {!collapsed && <span className="text-xs font-medium">Settings</span>}
             </button>
+            <button
+              onClick={async () => { await signOut(); window.location.href = "/login"; }}
+              className="w-full flex items-center gap-3 py-3 px-3 text-gray-500 hover:text-red-400 hover:bg-red-500/5 rounded-xl transition-all"
+            >
+              <LogOut size={18} />
+              {!collapsed && <span className="text-xs font-medium">Sign Out</span>}
+            </button>
             <div className={`flex items-center gap-3 py-3 px-3 bg-white/5 border border-white/5 rounded-xl ${collapsed ? "p-3" : ""}`}>
               <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shrink-0">
                 <User size={16} />
@@ -131,12 +139,12 @@ function Dashboard() {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col h-full pt-16 relative w-full min-w-0 overflow-hidden">
+      <main className="flex-1 flex flex-col h-full relative w-full min-w-0 overflow-hidden">
         {/* Background Accent */}
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
 
         {/* HEADER */}
-        <header className="flex items-center justify-between pl-16 pr-8 py-6 md:px-8 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
+        <header className="flex items-center justify-between pl-16 pr-8 py-4 md:px-8 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
               <MessageSquare size={20} />
@@ -149,7 +157,15 @@ function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Space for right header actions */}
+            <button 
+              onClick={() => navigate("/settings")}
+              className="group flex items-center gap-3 bg-white/5 hover:bg-white/10 px-1 py-1 pr-4 rounded-full border border-white/5 transition-all active:scale-95"
+            >
+              <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold text-[10px] tracking-tighter">
+                {user?.email?.slice(0, 2).toUpperCase() || "U"}
+              </div>
+              <span className="text-xs font-bold text-gray-300 group-hover:text-white hidden sm:block">Profile</span>
+            </button>
           </div>
         </header>
 
@@ -179,7 +195,7 @@ function Dashboard() {
                   <X size={20} />
                 </button>
 
-                <div className="flex items-center gap-4 mb-8">
+                <div className="flex items-center gap-4 mb-6">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
                     <HelpCircle size={24} />
                   </div>
@@ -190,38 +206,50 @@ function Dashboard() {
                 </div>
 
                 <div className="space-y-6">
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    If you encounter <span className="text-white font-semibold">"Intelligence processing failed,"</span> it is because parsing or indexing heavy/larger documents can sometimes exceed the <span className="text-white font-semibold">Render Free Tier</span> limit (512MB RAM). Please refresh and retry your upload.
-                  </p>
+                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      If you encounter <span className="text-emerald-400 font-semibold">"Intelligence processing failed,"</span> it is likely because parsing heavy documents exceeds the <span className="text-white font-semibold">Render Free Tier</span> limit (512MB RAM).
+                    </p>
+                    <p className="text-xs text-emerald-500/70 mt-2 font-medium">
+                      Tip: Refresh and retry your upload if this happens.
+                    </p>
+                  </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Technical Evolution:</h3>
+                    <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">Technical Architecture</h3>
 
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <p className="text-sm text-gray-400">
-                        <span className="text-gray-200 font-medium">Cloud Reasoning (Groq API):</span> We offloaded 100% of the AI's heavy "thinking" to Groq's Llama 3.1. This provides instant responses without using any of the server's limited RAM.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <p className="text-sm text-gray-400">
-                        <span className="text-gray-200 font-medium">Efficient Indexing (FastEmbed):</span> We swapped heavy PyTorch models for <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This reduced the AI engine size from 400MB+ to just ~90MB for maximum stability.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <p className="text-sm text-gray-400">
-                        <span className="text-gray-200 font-medium">Permanent Memory (Supabase):</span> We replaced temporary RAM storage with a persistent <span className="text-white font-mono text-xs">pgvector</span> database. Your documents now survive server restarts and Render "sleep" cycles.
-                      </p>
+                    <div className="grid gap-3">
+                      {[
+                        {
+                          title: "Cloud Reasoning (Groq API)",
+                          desc: "Offloaded 100% of AI thinking to Groq's Llama 3.1 for instant responses without RAM usage.",
+                          icon: "🧠"
+                        },
+                        {
+                          title: "Efficient Indexing (FastEmbed)",
+                          desc: "Swapped heavy PyTorch for ONNX, reducing engine size from 400MB+ to just ~90MB.",
+                          icon: "⚡"
+                        },
+                        {
+                          title: "Permanent Memory (Supabase)",
+                          desc: "Persistent pgvector database ensures your data survives server restarts and sleep cycles.",
+                          icon: "💾"
+                        }
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
+                          <span className="text-lg">{item.icon}</span>
+                          <div>
+                            <h4 className="text-xs font-bold text-white mb-1">{item.title}</h4>
+                            <p className="text-[11px] text-gray-500 leading-tight">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <p className="text-xs text-gray-500 leading-relaxed italic">
-                      💡 Pro Tip: If you encounter an error during upload, please <span className="text-gray-300 font-bold underline">refresh the page</span> and try again. For the best experience on free hosting, try uploading multiple smaller files instead of one massive document.
+                    <p className="text-[11px] text-gray-400 leading-relaxed italic">
+                      💡 <span className="text-gray-300 font-semibold">Best Practice:</span> For the best experience on free hosting, try uploading multiple smaller files instead of one massive document.
                     </p>
                   </div>
                 </div>

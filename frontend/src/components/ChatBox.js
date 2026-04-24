@@ -116,9 +116,9 @@ function ChatBox({ sessionId, onSessionCreated }) {
   return (
     <div className="flex flex-col h-full w-full max-w-4xl mx-auto">
       {/* MESSAGES AREA */}
-      <div className="flex-1 overflow-y-auto px-4 py-8 space-y-10 custom-scrollbar scroll-smooth">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-10 custom-scrollbar scroll-smooth">
         {chat.length === 0 && !loading && (
-          <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-30 animate-in fade-in duration-1000">
+          <div className="h-full flex flex-col items-center justify-start pt-[15vh] text-center space-y-6 opacity-30 animate-in fade-in duration-1000">
             <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center border border-white/5">
               <Sparkles size={40} className="text-emerald-500" />
             </div>
