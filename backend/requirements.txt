@@ -5,10 +5,8 @@ llama-index
 llama-index-llms-groq
 llama-index-embeddings-fastembed
 fastembed
-llama-index-vector-stores-faiss
-faiss-cpu
 supabase
-
+llama-index-vector-stores-supabase
 numpy==1.26.4
 tabulate
 Click>=6.0

@@ -78,14 +78,81 @@ This document tracks the complete evolution of Machine Learning models used in t
 | -------------- | ------------------- | --------------------------------------------------------------------- |
 | FastEmbed      | Document Embeddings | Uses ONNX to run AI without needing heavy PyTorch or massive RAM.     |
 | LlamaIndex     | RAG Engine          | Provides the best tools for connecting PDFs to AI brains.             |
-| FAISS          | Vector Database     | Fast, in-memory search that doesn't require an expensive external DB. |
+| **Supabase pgvector** | Vector Database     | Permanent storage for embeddings that survives server restarts and sleeps. |
 | Groq           | AI Chat (LLM)       | Lightning-fast cloud inference that uses zero local server memory.    |
-| Supabase       | Database & Auth     | Reliable cloud storage for chats and secure user authentication.      |
+| Supabase Auth  | Security & Auth     | Reliable cloud identity management and secure user authentication.    |
 
 ### System Highlights
 
-* Fully optimized for low-resource environments.
+* Fully persistent document memory using PostgreSQL.
 * Designed for scalability and modular upgrades.
 * Combines local efficiency with cloud-based intelligence.
 
 ---
+
+## 6. Runtime Issues & Limitations (Observed in Deployment)
+
+| Issue                     | Root Cause                        | Impact                                  |
+| ------------------------- | --------------------------------- | --------------------------------------- |
+| Large PDF upload failures | High memory usage during chunking | Request crashes or "processing failed"  |
+| Slow initial response     | Render cold start                 | Delay of 10–20 seconds on first request |
+| Long indexing time        | Large document chunk processing   | Increased response latency              |
+
+### Key Insight
+
+* The primary bottleneck is no longer memory persistence but initial processing of massive files.
+* Data loss on restart has been **FIXED** by migrating to Supabase pgvector.
+
+| Long indexing time        | Large document chunk processing   | Increased response latency              |
+
+### Key Insight
+
+* The primary bottleneck is not model download but runtime memory usage.
+* Embedding generation and FAISS indexing are the most resource-intensive operations.
+
+---
+
+## 7. Vector Database Comparison & Strategy
+
+| Feature       | FAISS           | Supabase pgvector       | Pinecone                 |
+| ------------- | --------------- | ----------------------- | ------------------------ |
+| Storage Type  | RAM (In-Memory) | Database (PostgreSQL)   | Managed Cloud Service    |
+| Persistence   | ❌ No            | ✅ Yes                   | ✅ Yes                    |
+| Scalability   | ❌ Limited       | ⚠️ Moderate             | ✅ High                   |
+| Performance   | ⚡ Very Fast     | ⚡ Fast                  | ⚡ Fast                   |
+| Cost          | Free            | Low / Free Tier         | Paid (after free tier)   |
+| Best Use Case | Local / Testing | Current Project Upgrade | Production Scale Systems |
+
+### Decision Strategy
+
+* FAISS was used initially for speed and simplicity.
+* Due to memory limitations, a shift to database-based vector storage is recommended.
+* Supabase pgvector is the most suitable next step due to existing integration and low cost.
+* Pinecone can be considered for large-scale production deployments.
+
+---
+
+## 8. Future Improvements & Planned Changes
+
+* Replace FAISS with Supabase pgvector for persistent storage.
+* Optimize chunk size to reduce memory consumption.
+* Introduce file size limits for stable processing.
+* Improve indexing pipeline for handling large documents efficiently.
+* Enhance system reliability for production-level deployment.
+
+### Upgrade Direction
+
+* Move from in-memory processing → persistent vector storage
+* Maintain lightweight embedding models
+* Continue using cloud-based LLM for scalability
+
+---
+
+## 9. Vector Storage Implementation (Supabase)
+
+| Step | Process |
+| :--- | :--- |
+| **Storage** | Embeddings stored in PostgreSQL using `pgvector` |
+| **Retrieval** | Similarity search using vector distance |
+| **Persistence** | Data remains even after server restart |
+| **Query Flow** | Query → embedding → DB search → LLM |

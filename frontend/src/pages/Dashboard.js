@@ -194,28 +194,21 @@ function Dashboard() {
                   <div className="flex items-start gap-3">
                     <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                     <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">Model Swap (HuggingFace → FastEmbed):</span> We swapped heavy Hugging Face PyTorch models for <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This reduced the model size from 400MB+ to just ~90MB to fit in Render's 512MB limit.
+                      <span className="text-gray-200 font-medium">Cloud Reasoning (Groq API):</span> We offloaded 100% of the AI's heavy "thinking" to Groq's Llama 3.1. This provides instant responses without using any of the server's limited RAM.
                     </p>
                   </div>
 
                   <div className="flex items-start gap-3">
                     <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                     <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">LLM Reasoning (Local → Groq):</span> Instead of running Llama 3 on the server (which needs 4GB+ RAM), we use the <span className="text-white font-mono text-xs">Groq Llama 3.1 API</span>. This offloads 100% of the heavy math to the cloud for instant responses.
+                      <span className="text-gray-200 font-medium">Efficient Indexing (FastEmbed):</span> We swapped heavy PyTorch models for <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This reduced the AI engine size from 400MB+ to just ~90MB for maximum stability.
                     </p>
                   </div>
 
                   <div className="flex items-start gap-3">
                     <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                     <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">Engine Optimization:</span> We moved from standard Python processing to <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This ensures that indexing your documents uses the minimum possible RAM while staying fast.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                    <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">Session Persistence:</span> AI memory is temporary for maximum speed. If you see "Server restarted," just re-upload your files. This occurs during system updates or after 15 minutes of inactivity.
+                      <span className="text-gray-200 font-medium">Permanent Memory (Supabase):</span> We replaced temporary RAM storage with a persistent <span className="text-white font-mono text-xs">pgvector</span> database. Your documents now survive server restarts and Render "sleep" cycles.
                     </p>
                   </div>
                 </div>
