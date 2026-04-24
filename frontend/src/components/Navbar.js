@@ -62,7 +62,7 @@ function Navbar() {
       )}
 
       {/* RIGHT: ACTIONS */}
-      <div className="flex items-center gap-6">
+      <div className="flex-1 flex items-center justify-end gap-3 md:gap-6">
         {user && !isDashboard && (
           <div className="flex items-center gap-8">
             {!isDashboard && (
@@ -87,13 +87,13 @@ function Navbar() {
         )}
 
         {!user && isLandingPage && (
-          <div className="flex items-center gap-6">
-            <Link to="/login" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+          <div className="flex items-center gap-3 md:gap-6">
+            <Link to="/login" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors whitespace-nowrap">
               Login
             </Link>
             <Link
               to="/signup"
-              className="bg-white text-black px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-white/5"
+              className="bg-white text-black px-4 md:px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-white/5 whitespace-nowrap"
             >
               Get Started
             </Link>

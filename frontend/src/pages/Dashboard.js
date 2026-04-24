@@ -60,7 +60,7 @@ function Dashboard() {
   }, [loadSessions]);
 
   return (
-    <div className="flex h-screen bg-[#080808] text-gray-200 overflow-hidden font-sans">
+    <div className="flex h-[100dvh] bg-[#080808] text-gray-200 overflow-hidden font-sans">
 
 
       {/* MOBILE OVERLAY */}
