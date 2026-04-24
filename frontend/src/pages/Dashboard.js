@@ -130,7 +130,7 @@ function Dashboard() {
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
 
         {/* HEADER */}
-        <header className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
+        <header className="flex items-center justify-between pl-16 pr-8 py-6 md:px-8 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
               <MessageSquare size={20} />
@@ -162,7 +162,7 @@ function Dashboard() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-[#111111] border border-white/10 w-full max-w-lg rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+              className="bg-[#111111] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
               
@@ -209,6 +209,13 @@ function Dashboard() {
                     <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                     <p className="text-sm text-gray-400">
                       <span className="text-gray-200 font-medium">Engine Optimization:</span> We moved from standard Python processing to <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This ensures that indexing your documents uses the minimum possible RAM while staying fast.
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <p className="text-sm text-gray-400">
+                      <span className="text-gray-200 font-medium">Session Persistence:</span> AI memory is temporary for maximum speed. If you see "Server restarted," just re-upload your files. This occurs during system updates or after 15 minutes of inactivity.
                     </p>
                   </div>
                 </div>

@@ -87,3 +87,12 @@ body {
 .markdown-content li {
   margin-bottom: 0.25rem;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

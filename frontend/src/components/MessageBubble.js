@@ -25,9 +25,9 @@ function MessageBubble({ message, isUser, isError }) {
         </div>
       </div>
       {/* MESSAGE TEXT */}
-      <div className={`flex flex-col max-w-[85%] md:max-w-[85%] space-y-1.5 ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`flex flex-col w-full md:max-w-[85%] space-y-1.5 ${isUser ? "items-end max-w-[85%]" : "items-start max-w-full md:max-w-[85%]"}`}>
         <div
-          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 ${isUser
+          className={`px-5 py-3.5 rounded-[22px] text-sm leading-relaxed shadow-sm transition-all duration-300 overflow-hidden ${isUser
               ? "bg-white text-black font-medium rounded-tr-none"
               : isError
                 ? "bg-red-950/20 text-red-200 border border-red-500/20 rounded-tl-none font-medium"
@@ -38,7 +38,20 @@ function MessageBubble({ message, isUser, isError }) {
             {isUser ? (
               <p className="whitespace-pre-wrap">{message}</p>
             ) : (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message}</ReactMarkdown>
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  table: ({node, ...props}) => (
+                    <div className="block w-full overflow-x-auto custom-scrollbar my-4 rounded-xl border border-white/5 bg-white/[0.02] shadow-inner" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}>
+                      <table {...props} className="min-w-[500px] w-full border-collapse divide-y divide-white/5" />
+                    </div>
+                  ),
+                  th: ({node, ...props}) => <th {...props} className="bg-white/5 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider" />,
+                  td: ({node, ...props}) => <td {...props} className="px-4 py-3 text-xs text-gray-400 border-t border-white/5" />
+                }}
+              >
+                {message}
+              </ReactMarkdown>
             )}
           </div>
         </div>

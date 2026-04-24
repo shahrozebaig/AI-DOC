@@ -48,6 +48,7 @@ To get the most out of **DocuMind AI** on the Render free tier (512MB RAM), plea
 | **Large Documents (10MB+)** | Split into smaller files (under 50 pages each). | Smaller chunks index much more reliably on low-resource hardware. |
 | **Site feels slow at first** | Wait 10-15 seconds for the initial load. | Render is "waking up" the server from its "sleep" state. |
 | **Long Indexing Spinner** | Stay on the page until it completes. | Deep parsing of complex PDFs takes time to ensure high retrieval accuracy. |
+| **"Server was restarted..."** | **Re-upload your documents** via the sidebar. | Occurs during system updates or when the server wakes from "sleep" mode. |
 
 ---
 

@@ -6,10 +6,10 @@ const Toast = ({ message, type, onClose }) => {
     const isSuccess = type === 'success';
     return (
         <motion.div
-            initial={{ opacity: 0, x: 20, y: 0 }}
+            initial={{ opacity: 0, x: 0, y: -20 }}
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed top-24 right-8 z-[10000]"
+            className="fixed top-6 left-4 right-4 md:left-auto md:right-8 md:top-24 z-[10000] flex justify-center md:justify-end"
         >
             <div className={`
                 relative overflow-hidden
@@ -38,8 +38,8 @@ const Toast = ({ message, type, onClose }) => {
                     {isError ? <AlertCircle size={16} /> : isSuccess ? <CheckCircle2 size={16} /> : <Zap size={16} />}
                 </div>
                 {/* CONTENT */}
-                <div className="flex flex-col min-w-[180px] max-w-[300px]">
-                    <span className="text-[12px] font-bold text-gray-200 leading-tight tracking-tight">
+                <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-[12px] font-bold text-gray-200 leading-tight tracking-tight break-words">
                         {message}
                     </span>
                 </div>
