@@ -12,7 +12,8 @@ import {
   ChevronRight,
   LogOut,
   ArrowLeft,
-  Database
+  Database,
+  HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 function Settings() {
@@ -66,6 +67,7 @@ function Settings() {
     { id: "profile", label: "Profile", icon: <User size={18} /> },
     { id: "security", label: "Security", icon: <ShieldCheck size={18} /> },
     { id: "data", label: "Clear AI Data", icon: <Database size={18} /> },
+    { id: "help", label: "Help Center", icon: <HelpCircle size={18} /> },
     { id: "account", label: "Account", icon: <Trash2 size={18} /> },
   ], []);
 
@@ -340,6 +342,25 @@ function Settings() {
       showToast(err.message || "Invalid code");
     }
   };
+
+  const helpSections = [
+    {
+      title: "System Optimization",
+      desc: "Performance guide for smooth operation",
+      items: [
+        { label: "Memory Limit", value: "512MB RAM (Render Free Tier)", status: "warning" },
+        { label: "Engine Size", value: "90MB (Optimized ONNX)", status: "success" },
+      ]
+    },
+    {
+      title: "Best Practices",
+      desc: "How to get the best results",
+      items: [
+        { label: "File Upload", value: "Prefer multiple small files over one large PDF", status: "info" },
+        { label: "Processing", value: "Refresh if 'Intelligence processing failed' appears", status: "info" },
+      ]
+    }
+  ];
 
 
 
@@ -739,7 +760,47 @@ function Settings() {
               </div>
             </div>
           )}
+          {/* HELP TAB */}
+          {activeTab === "help" && (
+            <div className="space-y-10">
+              <header>
+                <h2 className="text-2xl font-bold text-white mb-2">Help Center</h2>
+                <p className="text-sm text-gray-500">Guides and technical information for your AI Assistant.</p>
+              </header>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {helpSections.map((section, idx) => (
+                  <div key={idx} className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">{section.title}</h3>
+                      <p className="text-sm text-gray-500">{section.desc}</p>
+                    </div>
+                    <div className="space-y-4">
+                      {section.items.map((item, i) => (
+                        <div key={i} className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500 mb-1">{item.label}</p>
+                          <p className={`text-sm font-medium ${
+                            item.status === "warning" ? "text-amber-400" : 
+                            item.status === "success" ? "text-emerald-400" : "text-gray-300"
+                          }`}>{item.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-3xl p-8 flex items-center gap-6">
+                <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center shrink-0">
+                  <ShieldCheck className="text-emerald-500" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold mb-1">Secure Architecture</h3>
+                  <p className="text-sm text-gray-400">All thinking is offloaded to Groq Cloud API, while your document data stays locally indexed for your session security.</p>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 

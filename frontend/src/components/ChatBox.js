@@ -116,7 +116,7 @@ function ChatBox({ sessionId, onSessionCreated }) {
   return (
     <div className="flex flex-col h-full w-full max-w-4xl mx-auto relative">
       {/* MESSAGES AREA */}
-      <div className="flex-1 overflow-y-auto px-4 py-8 scroll-smooth hide-scrollbar z-10">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-8 scroll-smooth hide-scrollbar z-10">
         {chat.length === 0 && !loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-6 opacity-30 pointer-events-none">
             <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center border border-white/5">
