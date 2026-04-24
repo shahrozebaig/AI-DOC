@@ -72,7 +72,27 @@ graph TD
 
 ---
 
-## 6. Core Backend Components
+## 6. Data Cleanup Workflow
+
+```mermaid
+graph LR
+    User[User] -- Trigger Cleanup --> API[FastAPI Backend]
+    
+    subgraph "Clear Chat History"
+        API -- DELETE --> DB_Chats[Supabase: chat_sessions/messages]
+        DB_Chats -- Result --> User
+    end
+    
+    subgraph "Wipe All AI Data"
+        API -- DELETE ALL --> DB_All[Supabase: chats + document vectors]
+        DB_All -- Reset State --> User
+    end
+
+    style DB_Chats fill:#fdd,stroke:#f66
+    style DB_All fill:#f99,stroke:#f00
+```
+
+## 7. Core Backend Components
 
 | Component              | Responsibility                                                                 |
 | ---------------------- | ------------------------------------------------------------------------------ |
@@ -83,7 +103,7 @@ graph TD
 
 ---
 
-## 7. Authentication & Security
+## 8. Authentication & Security
 
 | Feature                | Implementation                                                                |
 | ---------------------- | ----------------------------------------------------------------------------- |
@@ -91,10 +111,12 @@ graph TD
 | **2FA (MFA)**          | App-based OTP verification using Supabase multi-factor infrastructure.         |
 | **OAuth Passwordless** | Custom backend logic bypasses password checks for social login users.         |
 | **Secure Deletion**    | Account deletion triggers cascading cleanup of all user-specific AI files.    |
+| **Clear History**      | Users can wipe all chat sessions and messages while keeping document embeddings intact. |
+| **Wipe All Data**      | Complete data purge: deletes all chat history and removes all document vectors. |
 
 ---
 
-## 8. Extreme Memory Optimizations
+## 9. Extreme Memory Optimizations
 
 | Optimization           | Technology / Logic                                                            | Impact                                      |
 | ---------------------- | ----------------------------------------------------------------------------- | ------------------------------------------- |
@@ -107,7 +129,7 @@ graph TD
 
 ---
 
-## 9. Data & AI Pipeline
+## 10. Data & AI Pipeline
 
 ```mermaid
 graph TD
@@ -146,7 +168,6 @@ This occurs when a user asks a question.
 
 | Step | Action | Logic / Optimization |
 | ---- | ------ | -------------------- |
-| **1** | **Question Embedding** | The user's question is translated into a vector using the same MiniLM model. |
 | **2** | **Similarity Search** | The system runs a `match_documents` RPC call in Supabase to find the top 5 most relevant text chunks. |
 | **3** | **Context Assembly** | The found chunks are packaged into a "Context Block" alongside the user's question. |
 | **4** | **LLM Synthesis** | The question + context is sent to **Groq (Llama 3)** for instant processing. |
@@ -154,10 +175,12 @@ This occurs when a user asks a question.
 
 ---
 
-## 10. Multi-User Isolation Strategy
+## 11. Multi-User Isolation Strategy
 
 | Isolation Layer | Implementation Detail                                                                 |
 | --------------- | ------------------------------------------------------------------------------------- |
 | **File System** | Every user has a unique physical directory on the disk based on their Supabase UID.   |
 | **AI Brain**    | The server utilizes Supabase Row Level Security (RLS). User A cannot query User B's embeddings. |
 | **Context**     | Retrieval is strictly restricted to the logged-in `user_id` during every database query. |
+
+---

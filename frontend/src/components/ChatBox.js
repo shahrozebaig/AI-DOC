@@ -142,7 +142,7 @@ function ChatBox({ sessionId, onSessionCreated }) {
         </div>
       </div>
       {/* INPUT AREA */}
-      <div className="p-4 md:p-6 w-full max-w-4xl mx-auto mb-4">
+      <div className="p-4 md:p-6 w-full max-w-4xl mx-auto mb-6 md:mb-8 pb-10 md:pb-6">
         <div className="relative flex items-center bg-[#1e1e1e] border border-white/10 rounded-[32px] px-4 py-2 shadow-2xl focus-within:border-white/20 transition-all">
           {/* Text Field */}
           <textarea

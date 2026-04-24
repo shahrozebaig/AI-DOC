@@ -6,11 +6,10 @@ import { AuthContext } from "../context/AuthContext";
 import { getChatSessions, deleteChatSession } from "../services/chat";
 import { useToast } from "../context/ToastContext";
 import {
-  Settings as SettingsIcon,
-  ChevronLeft,
-  ChevronRight,
+  Settings,
   MessageSquare,
-  Trash2
+  Trash2,
+  Menu
 } from "lucide-react";
 
 function Dashboard() {
@@ -77,14 +76,16 @@ function Dashboard() {
         className={`absolute md:relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-transform md:transition-all duration-300 ease-in-out h-full z-40 ${collapsed ? "-translate-x-full md:translate-x-0 w-72 md:w-20" : "translate-x-0 w-80 md:w-72"
           }`}
       >
-        {/* Toggle Button */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className={`absolute top-6 bg-[#111111] border border-white/10 rounded-full p-1.5 md:p-1 text-gray-400 hover:text-white transition-all z-50 shadow-xl ${collapsed ? "-right-12 md:-right-3" : "-right-3 md:-right-3"
-            }`}
-        >
-          {collapsed ? <ChevronRight size={16} className="md:w-3.5 md:h-3.5" /> : <ChevronLeft size={16} className="md:w-3.5 md:h-3.5" />}
-        </button>
+        {/* Sidebar Toggle - 3 Lines Menu */}
+        <div className={`p-4 flex ${collapsed ? "justify-center" : "justify-start"}`}>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-2 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition-all"
+            title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <Menu size={20} />
+          </button>
+        </div>
 
 
 
@@ -162,7 +163,7 @@ function Dashboard() {
             onClick={() => navigate("/settings")}
             className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-white/5 text-gray-400 hover:text-white group`}
           >
-            <SettingsIcon size={18} className="group-hover:rotate-45 transition-transform duration-500" />
+            <Settings size={18} className="group-hover:rotate-45 transition-transform duration-500" />
             {!collapsed && <span className="text-sm font-medium">Settings</span>}
           </button>
         </div>
@@ -187,12 +188,7 @@ function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full shadow-lg">
-              <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center border border-white/10 text-[10px] font-bold">
-                {user?.email?.substring(0, 2).toUpperCase()}
-              </div>
-              <span className="text-xs font-medium text-gray-300">Profile</span>
-            </div>
+            {/* Minimal Header Right */}
           </div>
         </header>
 

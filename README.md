@@ -48,7 +48,7 @@ To get the most out of **DocuMind AI** on the Render free tier (512MB RAM), plea
 | **Large Documents (10MB+)** | Split into smaller files (under 50 pages each). | Smaller chunks index much more reliably on low-resource hardware. |
 | **Site feels slow at first** | Wait 10-15 seconds for the initial load. | Render is "waking up" the server from its "sleep" state. |
 | **Long Indexing Spinner** | Stay on the page until it completes. | Deep parsing of complex PDFs takes time to ensure high retrieval accuracy. |
-| **"Server was restarted..."** | **Re-upload your documents** via the sidebar. | Occurs during system updates or when the server wakes from "sleep" mode. |
+| **"Where is my data?"** | Check your **Recent Chats** sidebar. | Data now persists 100% across restarts thanks to Supabase pgvector storage. |
 
 ---
 
@@ -63,7 +63,9 @@ To get the most out of **DocuMind AI** on the Render free tier (512MB RAM), plea
 | AI Model     | Groq LLaMA 3.1 8B Instant                       |
 | Embeddings   | FastEmbed (all-MiniLM-L6-v2)                    |
 | RAG Engine   | LlamaIndex                                      |
-| Vector Store | FAISS                                           |
-| Database     | Supabase                                        |
+| Vector Store | Supabase pgvector (Persistent)                  |
+| Database     | Supabase (PostgreSQL)                           |
 | Auth         | Supabase Auth (Email, Google, GitHub, 2FA)      |
 | Security     | OTP-based 2FA, Password Reset, Account Deletion |
+| Chat History | Persistent Session Management (localStorage + DB) |
+| Data Privacy | Clear History: Wipe chats only. Wipe All Data: Purge chats & documents. |
