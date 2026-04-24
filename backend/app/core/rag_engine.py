@@ -20,6 +20,7 @@ def get_vector_store(user_id: str):
     return SupabaseVectorStore(
         postgres_connection_string=os.getenv("SUPABASE_DB_URL"),
         collection_name="documents",
+        dimension=384
     )
 
 def create_index(documents, user_id: str):

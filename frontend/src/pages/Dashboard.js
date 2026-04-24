@@ -45,7 +45,7 @@ function Dashboard() {
 
       {/* MOBILE OVERLAY */}
       {!collapsed && (
-        <div 
+        <div
           className="md:hidden fixed inset-0 bg-black/60 z-30 backdrop-blur-sm mt-16"
           onClick={() => setCollapsed(true)}
         />
@@ -53,16 +53,14 @@ function Dashboard() {
 
       {/* SIDEBAR */}
       <aside
-        className={`absolute md:relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-transform md:transition-all duration-300 ease-in-out mt-16 h-[calc(100vh-4rem)] z-40 ${
-          collapsed ? "-translate-x-full md:translate-x-0 w-72 md:w-20" : "translate-x-0 w-80 md:w-72"
-        }`}
+        className={`absolute md:relative flex flex-col bg-[#0c0c0c] border-r border-white/5 transition-transform md:transition-all duration-300 ease-in-out mt-16 h-[calc(100vh-4rem)] z-40 ${collapsed ? "-translate-x-full md:translate-x-0 w-72 md:w-20" : "translate-x-0 w-80 md:w-72"
+          }`}
       >
         {/* Toggle Button */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`absolute top-6 bg-[#111111] border border-white/10 rounded-full p-1.5 md:p-1 text-gray-400 hover:text-white transition-all z-50 shadow-xl ${
-            collapsed ? "-right-12 md:-right-3" : "-right-3 md:-right-3"
-          }`}
+          className={`absolute top-6 bg-[#111111] border border-white/10 rounded-full p-1.5 md:p-1 text-gray-400 hover:text-white transition-all z-50 shadow-xl ${collapsed ? "-right-12 md:-right-3" : "-right-3 md:-right-3"
+            }`}
         >
           {collapsed ? <ChevronRight size={16} className="md:w-3.5 md:h-3.5" /> : <ChevronLeft size={16} className="md:w-3.5 md:h-3.5" />}
         </button>
@@ -154,77 +152,77 @@ function Dashboard() {
           </div>
         </section>
 
-      {/* HELP MODAL */}
-      <AnimatePresence>
-        {showHelp && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-[#111111] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
-              
-              <button 
-                onClick={() => setShowHelp(false)}
-                className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full text-gray-500 hover:text-white transition-colors"
+        {/* HELP MODAL */}
+        <AnimatePresence>
+          {showHelp && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="bg-[#111111] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
               >
-                <X size={20} />
-              </button>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
 
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
-                  <HelpCircle size={24} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">System Optimization</h2>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Performance Guide</p>
-                </div>
-              </div>
+                <button
+                  onClick={() => setShowHelp(false)}
+                  className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full text-gray-500 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
 
-              <div className="space-y-6">
-                <p className="text-sm text-gray-400 leading-relaxed">
-                  If you encounter <span className="text-white font-semibold">"Intelligence processing failed,"</span> it is because parsing or indexing heavy/larger documents can sometimes exceed the <span className="text-white font-semibold">Render Free Tier</span> limit (512MB RAM). Please refresh and retry your upload.
-                </p>
-
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Technical Evolution:</h3>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                    <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">Cloud Reasoning (Groq API):</span> We offloaded 100% of the AI's heavy "thinking" to Groq's Llama 3.1. This provides instant responses without using any of the server's limited RAM.
-                    </p>
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                    <HelpCircle size={24} />
                   </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                    <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">Efficient Indexing (FastEmbed):</span> We swapped heavy PyTorch models for <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This reduced the AI engine size from 400MB+ to just ~90MB for maximum stability.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                    <p className="text-sm text-gray-400">
-                      <span className="text-gray-200 font-medium">Permanent Memory (Supabase):</span> We replaced temporary RAM storage with a persistent <span className="text-white font-mono text-xs">pgvector</span> database. Your documents now survive server restarts and Render "sleep" cycles.
-                    </p>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">System Optimization</h2>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Performance Guide</p>
                   </div>
                 </div>
 
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                  <p className="text-xs text-gray-500 leading-relaxed italic">
-                    💡 Pro Tip: If you encounter an error during upload, please <span className="text-gray-300 font-bold underline">refresh the page</span> and try again. For the best experience on free hosting, try uploading multiple smaller files instead of one massive document.
+                <div className="space-y-6">
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    If you encounter <span className="text-white font-semibold">"Intelligence processing failed,"</span> it is because parsing or indexing heavy/larger documents can sometimes exceed the <span className="text-white font-semibold">Render Free Tier</span> limit (512MB RAM). Please refresh and retry your upload.
                   </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
-      <style>{`
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Technical Evolution:</h3>
+
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <p className="text-sm text-gray-400">
+                        <span className="text-gray-200 font-medium">Cloud Reasoning (Groq API):</span> We offloaded 100% of the AI's heavy "thinking" to Groq's Llama 3.1. This provides instant responses without using any of the server's limited RAM.
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <p className="text-sm text-gray-400">
+                        <span className="text-gray-200 font-medium">Efficient Indexing (FastEmbed):</span> We swapped heavy PyTorch models for <span className="text-white font-mono text-xs">FastEmbed/ONNX</span>. This reduced the AI engine size from 400MB+ to just ~90MB for maximum stability.
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <p className="text-sm text-gray-400">
+                        <span className="text-gray-200 font-medium">Permanent Memory (Supabase):</span> We replaced temporary RAM storage with a persistent <span className="text-white font-mono text-xs">pgvector</span> database. Your documents now survive server restarts and Render "sleep" cycles.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <p className="text-xs text-gray-500 leading-relaxed italic">
+                      💡 Pro Tip: If you encounter an error during upload, please <span className="text-gray-300 font-bold underline">refresh the page</span> and try again. For the best experience on free hosting, try uploading multiple smaller files instead of one massive document.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        <style>{`
             .custom-scrollbar::-webkit-scrollbar {
                 width: 4px;
             }

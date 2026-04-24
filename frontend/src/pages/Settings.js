@@ -1,15 +1,15 @@
 import { useState, useContext, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-  import { AuthContext } from "../context/AuthContext";
-  import { supabase } from "../lib/supabaseClient";
-  import { signOut } from "../services/auth";
-  import { useToast } from "../context/ToastContext";
-  import {
-    Lock,
-    ShieldCheck,
-    User,
-    Trash2,
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../lib/supabaseClient";
+import { signOut } from "../services/auth";
+import { useToast } from "../context/ToastContext";
+import {
+  Lock,
+  ShieldCheck,
+  User,
+  Trash2,
   ChevronRight,
   LogOut,
   ArrowLeft
@@ -328,8 +328,8 @@ function Settings() {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === item.id
-                    ? "bg-white/10 text-white border border-white/10 shadow-lg"
-                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
+                  ? "bg-white/10 text-white border border-white/10 shadow-lg"
+                  : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
                   }`}
               >
                 <div className="flex items-center gap-3">
@@ -464,8 +464,8 @@ function Settings() {
                       <p className="text-xs text-gray-500">Protect your account with a secondary verification code.</p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${mfaEnabled
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : "bg-gray-500/10 text-gray-500 border-gray-500/20"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : "bg-gray-500/10 text-gray-500 border-gray-500/20"
                       }`}>
                       {mfaEnabled ? "Active" : "Inactive"}
                     </div>
@@ -579,7 +579,7 @@ function Settings() {
                               onChange={(e) => setDeleteConfirmText(e.target.value)}
                             />
                           </div>
-                          { !isOAuthUser && (
+                          {!isOAuthUser && (
                             <div>
                               <label className="text-xs font-bold text-red-400/60 uppercase tracking-widest mb-2 block">Your Password</label>
                               <input
