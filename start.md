@@ -1,10 +1,10 @@
-# 🚀 Getting Started with DocuMind AI
+# Getting Started with DocuMind AI
 
 Follow these steps to set up and run the **DocuMind AI** platform on your local machine.
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 Ensure you have the following installed and configured:
 - **Python 3.10+**
 - **Node.js 18+**
@@ -14,7 +14,7 @@ Ensure you have the following installed and configured:
 
 ---
 
-## 📂 1. Backend Setup (Python/FastAPI)
+## 1. Backend Setup (Python/FastAPI)
 
 1. **Navigate to the backend directory:**
    ```bash
@@ -51,7 +51,7 @@ Ensure you have the following installed and configured:
 
 ---
 
-## 💻 2. Frontend Setup (React)
+## 2. Frontend Setup (React)
 
 1. **Navigate to the frontend directory:**
    ```bash
@@ -78,7 +78,7 @@ Ensure you have the following installed and configured:
 
 ---
 
-## 💡 Troubleshooting
+## Troubleshooting
 - **RAM Issues**: If indexing fails, ensure no other heavy processes are running.
 - **Persistence**: Ensure your `SUPABASE_DB_URL` is correct to allow `pgvector` to save your embeddings permanently.
 - **Auth**: Double-check your Supabase Redirect URLs if social login fails.

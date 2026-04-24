@@ -16,7 +16,7 @@ function Dashboard() {
   const { user } = useContext(AuthContext);
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => window.innerWidth < 768);
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(() => {
     return localStorage.getItem("currentSessionId") || null;
@@ -175,8 +175,17 @@ function Dashboard() {
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
 
         {/* HEADER */}
-        <header className="flex items-center justify-between pl-16 pr-8 py-4 md:px-8 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
-          <div className="flex items-center gap-4">
+        <header className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md z-20">
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger — always visible on small screens */}
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="md:hidden p-2 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition-all"
+              title="Toggle Sidebar"
+            >
+              <Menu size={22} />
+            </button>
+
             <div className="w-10 h-10 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
               <MessageSquare size={20} />
             </div>
