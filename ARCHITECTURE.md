@@ -95,8 +95,6 @@ graph TD
 
 ## 8. Detailed RAG Workflow
 
-The core intelligence of DocuMind AI follows a strict 2-phase pipeline to ensure fast retrieval while keeping memory usage extremely low.
-
 ```mermaid
 graph TD
     %% Phase A: Ingestion
