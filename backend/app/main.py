@@ -8,6 +8,7 @@ from app.api.chat import router as chat_router
 from app.api.upload import router as upload_router
 from app.api.health import router as health_router
 from app.api.user import router as user_router
+from app.api.data import router as data_router
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -20,6 +21,7 @@ app.include_router(chat_router, prefix="/chat")
 app.include_router(upload_router, prefix="/upload")
 app.include_router(health_router, prefix="/health")
 app.include_router(user_router, prefix="/user")
+app.include_router(data_router, prefix="/data")
 
 @app.get("/")
 async def root():

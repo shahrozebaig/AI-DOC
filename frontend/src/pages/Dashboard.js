@@ -13,7 +13,8 @@ import {
   ChevronRight,
   MessageSquare,
   HelpCircle,
-  X
+  X,
+  Eraser
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -99,6 +100,13 @@ function Dashboard() {
             >
               <HelpCircle size={18} />
               {!collapsed && <span className="text-xs font-medium">Help & Info</span>}
+            </button>
+            <button
+              onClick={() => navigate("/settings?tab=data")}
+              className="w-full flex items-center gap-3 py-3 px-3 text-gray-500 hover:text-red-400 hover:bg-red-500/5 rounded-xl transition-all"
+            >
+              <Eraser size={18} />
+              {!collapsed && <span className="text-xs font-medium">Clear AI Data</span>}
             </button>
             <button
               onClick={() => navigate("/settings")}

@@ -12,7 +12,9 @@ import {
   Trash2,
   ChevronRight,
   LogOut,
-  ArrowLeft
+  ArrowLeft,
+  Database,
+  RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 function Settings() {
@@ -36,6 +38,9 @@ function Settings() {
   const [mfaVerifyCode, setMfaVerifyCode] = useState("");
   const [mfaUnenrollFactorId, setMfaUnenrollFactorId] = useState("");
   const [stepUpAction, setStepUpAction] = useState(null);
+  const [showClearChatsConfirm, setShowClearChatsConfirm] = useState(false);
+  const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const checkMFA = useCallback(async () => {
     if (!user) return;
     try {
@@ -60,6 +65,11 @@ function Settings() {
   }, [user]);
   useEffect(() => {
     checkMFA();
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab && menuItems.some(item => item.id === tab)) {
+      setActiveTab(tab);
+    }
   }, [checkMFA]);
   const updateEmail = async () => {
     if (!email || !emailPassword) return showToast("All fields are required");
@@ -248,6 +258,33 @@ function Settings() {
     }
   };
 
+  const handleClearData = async (type) => {
+    setIsClearing(true);
+    try {
+      const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:8000";
+      const endpoint = type === 'chats' ? '/data/clear-chats/' : '/data/clear-all/';
+      
+      const res = await fetch(`${baseUrl}${endpoint}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message, "success");
+        setShowClearChatsConfirm(false);
+        setShowClearAllConfirm(false);
+      } else {
+        throw new Error(data.detail || "Action failed");
+      }
+    } catch (err) {
+      showToast(err.message || "Something went wrong");
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   const confirmStepUp = async () => {
     if (!mfaVerifyCode) return showToast("Verification code is required");
 
@@ -301,6 +338,7 @@ function Settings() {
   const menuItems = [
     { id: "profile", label: "Profile", icon: <User size={18} /> },
     { id: "security", label: "Security", icon: <ShieldCheck size={18} /> },
+    { id: "data", label: "Clear AI Data", icon: <Database size={18} /> },
     { id: "account", label: "Account", icon: <Trash2 size={18} /> },
   ];
 
@@ -541,6 +579,94 @@ function Settings() {
                         Disable Protection
                       </button>
                     )
+                  )}
+                </section>
+              </div>
+            </div>
+          )}
+
+          {/* DATA MANAGEMENT TAB */}
+          {activeTab === "data" && (
+            <div className="space-y-10">
+              <header>
+                <h2 className="text-2xl font-bold text-white mb-2">Clear AI Data</h2>
+                <p className="text-sm text-gray-500">Manage your data storage and privacy settings.</p>
+              </header>
+
+              <div className="space-y-6">
+                {/* Clear Chats Section */}
+                <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-white">Clear Chat History</h3>
+                      <p className="text-sm text-gray-500">Wipe all your chat sessions and messages. Your documents will remain indexed.</p>
+                    </div>
+                    <button
+                      disabled={isClearing}
+                      onClick={() => setShowClearChatsConfirm(true)}
+                      className="shrink-0 bg-white/5 border border-white/10 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-white/10 transition-all active:scale-95 disabled:opacity-50"
+                    >
+                      Clear History
+                    </button>
+                  </div>
+
+                  {showClearChatsConfirm && (
+                    <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl animate-in fade-in zoom-in duration-300">
+                      <p className="text-sm text-red-400 mb-4 font-medium">Are you sure you want to delete ALL chat sessions? This cannot be undone.</p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => handleClearData('chats')}
+                          disabled={isClearing}
+                          className="flex-1 bg-red-600 text-white text-xs font-bold py-2 rounded-lg hover:bg-red-500 transition-all"
+                        >
+                          {isClearing ? "Clearing..." : "Yes, Clear Chats"}
+                        </button>
+                        <button
+                          onClick={() => setShowClearChatsConfirm(false)}
+                          className="flex-1 bg-white/5 text-gray-400 text-xs font-bold py-2 rounded-lg hover:bg-white/10 transition-all border border-white/10"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                {/* Clear All Section */}
+                <section className="bg-[#111111] border border-white/5 rounded-3xl p-8 space-y-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-white">Clear All AI Data</h3>
+                      <p className="text-sm text-gray-500">Wipe EVERYTHING: chat history and all document embeddings. You will need to re-upload files to chat again.</p>
+                    </div>
+                    <button
+                      disabled={isClearing}
+                      onClick={() => setShowClearAllConfirm(true)}
+                      className="shrink-0 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-all active:scale-95 disabled:opacity-50"
+                    >
+                      Wipe All Data
+                    </button>
+                  </div>
+
+                  {showClearAllConfirm && (
+                    <div className="p-6 bg-red-950/20 border border-red-500/20 rounded-2xl animate-in fade-in zoom-in duration-300">
+                      <p className="text-sm text-red-400 mb-4 font-bold">CRITICAL: This will permanently delete all your chats and indexed documents. Proceed?</p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => handleClearData('all')}
+                          disabled={isClearing}
+                          className="flex-1 bg-red-600 text-white text-xs font-bold py-2 rounded-lg hover:bg-red-500 transition-all"
+                        >
+                          {isClearing ? "Wiping..." : "Yes, Wipe Everything"}
+                        </button>
+                        <button
+                          onClick={() => setShowClearAllConfirm(false)}
+                          className="flex-1 bg-white/5 text-gray-400 text-xs font-bold py-2 rounded-lg hover:bg-white/10 transition-all border border-white/10"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </section>
               </div>
