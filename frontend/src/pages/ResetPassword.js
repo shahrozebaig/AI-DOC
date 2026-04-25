@@ -3,7 +3,8 @@ import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../services/auth";
 import { useToast } from "../context/ToastContext";
 import AuthLayout from "../components/AuthLayout";
-import { ShieldCheck, Lock, Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
+import AuthBackground from "../components/AuthBackground";
+import { ShieldCheck, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function ResetPassword() {
@@ -11,6 +12,7 @@ function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
@@ -23,149 +25,143 @@ function ResetPassword() {
       if (!user) return;
       const { data: factors, error } = await supabase.auth.mfa.listFactors();
       if (error) return;
-      const verifiedFactor = (factors.all || factors.totp || []).find(f => f.status === 'verified');
-      if (verifiedFactor) {
-        setMfaEnabled(true);
-        setMfaFactorId(verifiedFactor.id);
-      }
+      const verifiedFactor = (factors.all || factors.totp || []).find(f => f.status === "verified");
+      if (verifiedFactor) { setMfaEnabled(true); setMfaFactorId(verifiedFactor.id); }
     };
     checkMfaStatus();
   }, []);
 
   const handleReset = async () => {
-    if (!password || !confirmPassword) {
-      return showToast("Please fill in all password fields.");
-    }
-    if (password !== confirmPassword) {
-      return showToast("Passwords do not match.");
-    }
-    if (mfaEnabled && !mfaCode) {
-      return setMfaError("MFA code is required.");
-    }
+    if (!password || !confirmPassword) return showToast("Please fill in all fields.");
+    if (password !== confirmPassword) return showToast("Passwords do not match.");
+    if (mfaEnabled && !mfaCode) return setMfaError("MFA code is required.");
     setLoading(true);
     try {
       if (mfaEnabled) {
         const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
         if (challengeError) throw challengeError;
-        const { error: verifyError } = await supabase.auth.mfa.verify({
-          factorId: mfaFactorId,
-          challengeId: challengeData.id,
-          code: mfaCode
-        });
+        const { error: verifyError } = await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: challengeData.id, code: mfaCode });
         if (verifyError) throw verifyError;
       }
-      const { error } = await supabase.auth.updateUser({
-        password,
-      });
+      const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      showToast("Security update successful! Identity verified.", "success");
-      setTimeout(async () => {
-        await signOut();
-        window.location.href = "/login";
-      }, 2000);
+      showToast("Password updated successfully!", "success");
+      setTimeout(async () => { await signOut(); window.location.href = "/login"; }, 2000);
     } catch (err) {
-      if (err.message.includes("MFA")) {
-        setMfaError("Invalid or expired MFA code.");
-      } else {
-        showToast(err.message, "error");
-      }
+      if (err.message.includes("MFA")) setMfaError("Invalid or expired MFA code.");
+      else showToast(err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const inp = "w-full bg-[#18181b] border border-white/[0.09] rounded-xl px-4 py-3 pl-11 text-sm text-zinc-200 placeholder-zinc-600 outline-none focus:border-white/25 transition-all";
+
   return (
-    <AuthLayout>
-      <div className="w-full max-w-[420px] z-10">
-        <div className="text-center mb-10">
-          <div className="inline-flex p-3 rounded-2xl bg-white/5 border border-white/10 mb-4 shadow-xl">
-            <ShieldCheck className="text-emerald-500" size={28} />
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tighter">Security Update</h1>
-          <p className="text-gray-500 text-sm mt-2 font-medium uppercase tracking-widest text-[10px]">Define your new access credentials</p>
-        </div>
-        
-        <div className="bg-[#0c0c0c] border border-white/[0.05] rounded-[32px] p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] backdrop-blur-3xl relative overflow-hidden group">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase font-bold tracking-widest text-gray-500 ml-1">New Password</label>
-              <div className="relative group/field">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/field:text-emerald-500 transition-colors">
-                  <Lock size={18} />
+    <div className="relative min-h-screen" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <AuthBackground />
+      <AuthLayout>
+        <div className="w-full max-w-sm mx-4">
+
+          {/* Single dark card — header + form together */}
+          <div className="bg-[#0f0f11] border border-white/[0.07] rounded-2xl p-6 shadow-2xl shadow-black/50 space-y-5">
+
+            {/* Header inside card */}
+            <div className="text-center pb-4 border-b border-white/[0.06]">
+              <div className="inline-flex w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 items-center justify-center mb-3">
+                <Lock size={20} className="text-emerald-400" />
+              </div>
+              <h1 className="text-lg font-semibold text-white mb-0.5">Reset Password</h1>
+              <p className="text-xs text-zinc-500">Choose a strong new password for your account.</p>
+            </div>
+
+            {/* New Password */}
+            <div>
+              <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">New Password</label>
+              <div className="relative">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none">
+                  <Lock size={14} />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Min. 8 characters"
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-sm text-white placeholder-gray-600 focus:bg-white/10 focus:border-emerald-500/30 outline-none transition-all"
-                  onChange={(e) => setPassword(e.target.value)}
+                  className={inp + " pr-11"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleReset()}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 p-1"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <button type="button" tabIndex={-1} onClick={() => setShowPassword(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-300 transition-colors">
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase font-bold tracking-widest text-gray-500 ml-1">Confirm Identity</label>
-              <div className="relative group/field">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/field:text-emerald-500 transition-colors">
-                  <Lock size={18} />
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">Confirm Password</label>
+              <div className="relative">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none">
+                  <Lock size={14} />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showConfirm ? "text" : "password"}
                   placeholder="Repeat password"
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-sm text-white placeholder-gray-600 focus:bg-white/10 focus:border-emerald-500/30 outline-none transition-all"
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={inp + " pr-11"}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleReset()}
                 />
+                <button type="button" tabIndex={-1} onClick={() => setShowConfirm(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-300 transition-colors">
+                  {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
             </div>
 
+            {/* MFA (if enabled) */}
             <AnimatePresence>
               {mfaEnabled && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="pt-6 border-t border-white/[0.05] space-y-4"
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="pt-4 border-t border-white/[0.06] space-y-3"
                 >
                   <div className="flex items-center gap-2">
-                    <ShieldCheck size={14} className="text-emerald-500" />
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-500">MFA Verification Active</span>
+                    <ShieldCheck size={13} className="text-emerald-400" />
+                    <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">2FA Required</span>
                   </div>
                   <input
                     type="text"
                     maxLength={6}
-                    placeholder="000 000"
-                    className={`w-full bg-emerald-500/5 border p-4 tracking-[0.4em] font-mono text-center text-2xl text-emerald-500 rounded-2xl outline-none transition-all ${mfaError ? "border-red-500" : "border-emerald-500/20 focus:border-emerald-500"}`}
-                    onChange={(e) => { setMfaCode(e.target.value.replace(/[^0-9]/g, '')); setMfaError(""); }}
+                    placeholder="000000"
+                    className={`w-full bg-emerald-500/5 border ${mfaError ? "border-red-500/60" : "border-emerald-500/20 focus:border-emerald-500/40"} rounded-xl px-4 py-3 tracking-[0.5em] font-mono text-center text-lg text-emerald-400 outline-none transition-all`}
+                    onChange={e => { setMfaCode(e.target.value.replace(/[^0-9]/g, "")); setMfaError(""); }}
                     value={mfaCode}
                   />
-                  {mfaError && <p className="text-red-500 text-[10px] uppercase font-bold tracking-widest text-center">{mfaError}</p>}
+                  {mfaError && <p className="text-red-400 text-xs text-center">{mfaError}</p>}
                 </motion.div>
               )}
             </AnimatePresence>
 
+            {/* Submit */}
             <button
               onClick={handleReset}
               disabled={loading}
-              className="w-full bg-white hover:bg-gray-200 text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group shadow-xl shadow-white/5"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-lg shadow-emerald-600/20 mt-1"
             >
-              {loading ? <Loader2 className="animate-spin" size={20} /> : (
-                <>
-                  Secure Account <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
+              {loading ? <Loader2 size={18} className="animate-spin" /> : "Update Password"}
             </button>
           </div>
+
+          <p className="text-center mt-5 text-xs text-zinc-600">
+            Remembered your password?{" "}
+            <a href="/login" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">Sign in</a>
+          </p>
         </div>
-        <p className="text-center mt-8 text-[11px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
-          Neural encryption active for this session
-        </p>
-      </div>
-    </AuthLayout>
+      </AuthLayout>
+    </div>
   );
 }
 
