@@ -2,60 +2,52 @@ import { Link } from "react-router-dom";
 import SplineBackground from "./SplineBackground";
 
 function Hero() {
-  return (
-    <section className="relative min-h-[100dvh] flex items-center justify-center text-center overflow-hidden bg-hero">
-      
-      {/* 3D Background */}
-      <SplineBackground />
+  const scroll = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
-      {/* Overlay */}
+  return (
+    <section className="relative min-h-[100dvh] flex items-center justify-center text-center overflow-hidden bg-[#09090b]"
+      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+
+      <SplineBackground />
       <div className="absolute inset-0 bg-black/60 z-[1]" />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-3xl px-6 pointer-events-none">
+      <div className="relative z-10 max-w-4xl px-6 pointer-events-none">
 
-        {/* TITLE */}
-        <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold uppercase animate-fade-up animate-gradient-text">
+        {/* Animated multicolor title */}
+        <style>{`
+          @keyframes gradientShift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          .animated-title {
+            background: linear-gradient(270deg, #34d399, #22d3ee, #818cf8, #f472b6, #fb923c, #34d399);
+            background-size: 400% 400%;
+            animation: gradientShift 5s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+        `}</style>
+
+        <h1 className="animated-title text-7xl md:text-9xl font-bold leading-[1.0] tracking-tight mb-8">
           DocuMind AI
         </h1>
 
-        {/* 🔥 NEW TAGLINE */}
-        <p className="mt-4 text-lg text-gray-200 animate-fade-up">
-          Turn your documents into intelligent conversations.
+        <p className="text-base md:text-lg text-zinc-400 leading-relaxed mb-10 max-w-xl mx-auto">
+          Turn your documents into intelligent conversations. Upload PDFs, ask questions, and get precise answers instantly.
         </p>
 
-        {/* DESCRIPTION */}
-        <p className="mt-2 text-gray-400 animate-fade-up">
-          Upload PDFs, ask questions, and get precise answers instantly using AI-powered retrieval.
-        </p>
-
-        {/* 🔥 FEATURES */}
-        <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm text-gray-300 animate-fade-up">
-          <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur">
-            ⚡ Instant Answers
-          </div>
-          <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur">
-            📄 Smart PDF Analysis
-          </div>
-          <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur">
-            🤖 AI-Powered Search
-          </div>
-        </div>
-
-        {/* BUTTONS */}
-        <div className="flex justify-center gap-4 mt-8 pointer-events-auto animate-fade-up">
-          <Link
-            to="/login"
-            className="bg-primary text-black px-6 py-3 rounded hover:brightness-110 font-semibold"
-          >
+        <div className="flex flex-wrap justify-center gap-3 pointer-events-auto">
+          <Link to="/signup"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-95 shadow-lg shadow-emerald-600/30">
             Get Started Free
           </Link>
-
-          <button className="bg-white text-black px-6 py-3 rounded hover:brightness-90 font-semibold">
-            Learn More
+          <button onClick={() => scroll("how")}
+            className="bg-white/[0.07] hover:bg-white/[0.12] border border-white/[0.1] text-zinc-200 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-95">
+            See How It Works
           </button>
         </div>
-
       </div>
     </section>
   );

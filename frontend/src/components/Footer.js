@@ -1,15 +1,18 @@
 function Footer() {
   return (
-    <footer className="py-6 text-center text-gray-400 border-t border-gray-800">
+    <footer className="bg-[#09090b] border-t border-white/[0.06] py-8 px-6"
+      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 
-      <p className="text-sm">
-        © 2026 <span className="text-white font-semibold">DocuMind AI</span>. All rights reserved.
-      </p>
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <img src="/Logo.jpeg" alt="DocuMind AI" className="h-8 w-auto rounded-lg" />
+          <span className="text-sm font-semibold text-white">DocuMind AI</span>
+        </div>
 
-      <p className="text-xs mt-2 text-gray-500">
-        Built for intelligent document interaction.
-      </p>
-
+        {/* Copyright */}
+        <p className="text-xs text-zinc-600">&copy; 2026 DocuMind AI. All rights reserved.</p>
+      </div>
     </footer>
   );
 }
