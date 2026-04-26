@@ -38,6 +38,10 @@ Below is the visual overview of how **DocuMind AI** processes documents, manages
 
 ---
 
+https://github.com/user-attachments/assets/8e7537ee-7df8-4d0e-bfa6-b76eeac9cfc9
+
+---
+
 ## 💡 Troubleshooting & Performance Tips
 
 To get the most out of **DocuMind AI** on the Render free tier (512MB RAM), please refer to the table below for handling common scenarios:
