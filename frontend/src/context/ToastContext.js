@@ -13,12 +13,16 @@ export const useToast = () => {
 
 export const ToastProvider = ({ children }) => {
     const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+    const timerRef = React.useRef(null);
 
     const showToast = useCallback((message, type = 'error') => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        
         setToast({ show: true, message, type });
-        // Auto-hide after 4 seconds
-        setTimeout(() => {
+        
+        timerRef.current = setTimeout(() => {
             setToast(prev => ({ ...prev, show: false }));
+            timerRef.current = null;
         }, 4000);
     }, []);
 
