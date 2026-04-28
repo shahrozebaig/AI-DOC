@@ -30,7 +30,7 @@ function Signup() {
       showToast(error.message);
     } else {
       await signOut();
-      showToast("Account created! Please sign in.", "success");
+      showToast("Account created", "success");
       navigate("/login");
     }
   };

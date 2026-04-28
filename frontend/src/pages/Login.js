@@ -59,6 +59,8 @@ function Login() {
       else if (error.message.toLowerCase().includes("password")) setErrorField("password");
       else setErrorField("both");
       showToast(msg);
+    } else {
+      showToast("Login successful", "success");
     }
   };
 
@@ -70,6 +72,7 @@ function Login() {
       if (challengeError) throw challengeError;
       const { error: verifyError } = await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: challengeData.id, code: mfaCode });
       if (verifyError) throw verifyError;
+      showToast("Login successful", "success");
       navigate("/dashboard");
     } catch { setMfaError("Invalid code. Try again."); }
   };
