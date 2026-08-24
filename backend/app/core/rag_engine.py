@@ -2,6 +2,7 @@ from llama_index.core import VectorStoreIndex, Settings
 from llama_index.core.storage.storage_context import StorageContext
 from llama_index.vector_stores.supabase import SupabaseVectorStore
 from llama_index.core.memory import ChatMemoryBuffer
+from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter
 import os
 
 user_indices = {}
@@ -27,7 +28,6 @@ def create_index(documents, user_id: str):
     global user_indices, user_query_engines
     init_models()
     
-    # Add user_id to metadata for RLS
     for doc in documents:
         doc.metadata["user_id"] = user_id
 
@@ -44,25 +44,48 @@ def create_index(documents, user_id: str):
     gc.collect()
 
     user_indices[user_id] = index
+
+    filters = MetadataFilters(
+        filters=[
+            ExactMatchFilter(
+                key="user_id",
+                value=user_id
+            )
+        ]
+    )
+
     user_query_engines[user_id] = index.as_query_engine(
-        similarity_top_k=5, 
-        response_mode="compact" 
+        similarity_top_k=5,
+        response_mode="compact",
+        filters=filters
     )
 
 def get_query_engine(user_id: str):
     if user_id not in user_query_engines:
-        # Try to restore from Supabase
         init_models()
         vector_store = get_vector_store(user_id)
         index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
+
+        filters = MetadataFilters(
+            filters=[
+                ExactMatchFilter(
+                    key="user_id",
+                    value=user_id
+                )
+            ]
+        )
+
         user_indices[user_id] = index
-        user_query_engines[user_id] = index.as_query_engine(similarity_top_k=5, response_mode="compact")
+        user_query_engines[user_id] = index.as_query_engine(
+            similarity_top_k=5,
+            response_mode="compact",
+            filters=filters
+        )
     
     return user_query_engines[user_id]
 
 def get_chat_engine(user_id: str, history=None):
     if user_id not in user_indices:
-        # Try to restore from Supabase
         try:
             init_models()
             vector_store = get_vector_store(user_id)
@@ -72,7 +95,18 @@ def get_chat_engine(user_id: str, history=None):
             raise Exception("No documents indexed yet. Upload a file first.")
             
     index = user_indices[user_id]
+
+    filters = MetadataFilters(
+        filters=[
+            ExactMatchFilter(
+                key="user_id",
+                value=user_id
+            )
+        ]
+    )
+
     memory = ChatMemoryBuffer.from_defaults(token_limit=1500)
+
     return index.as_chat_engine(
         chat_mode="context",
         memory=memory,
@@ -86,6 +120,7 @@ def get_chat_engine(user_id: str, history=None):
             "4. Provide long, detailed answers if necessary, but keep them organized in the numbered points format.\n"
             "5. NEVER mention full local file paths (e.g., C:\\Users\\... or app/data/uploads/...). Refer to documents by their names only."
         ),
-        similarity_top_k=20, 
+        similarity_top_k=20,
+        filters=filters,
         verbose=True
     )
